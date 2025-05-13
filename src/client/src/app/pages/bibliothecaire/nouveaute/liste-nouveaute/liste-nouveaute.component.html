@@ -1,0 +1,28 @@
+<div class="carousel-container">
+    <div class="card nouveautes-card">
+        <div class="carousel-header">
+            <h1>Nouveautés</h1>
+            <p-button *ngIf="!isHosted" label="Ajouter" icon="pi pi-plus" routerLink="/ajouter"> </p-button>
+        </div>
+        <p-carousel [value]="publication || []" [numVisible]="3" [numScroll]="1" [circular]="true"
+            [responsiveOptions]="responsiveOptions" [autoplayInterval]="0" [showNavigators]="true"
+            [showIndicators]="true">
+            <ng-template let-pub pTemplate="item">
+                <div class="pub-card" [routerLink]="['/product-detail', pub.id]">
+                    <div class="image-container position-relative">
+                        <img src="{{ pub.image }}" [alt]="pub.titre" class="pub-image" />
+                        <p-tag [value]="pub.inventoryStatus" [severity]="pub.severity" class="status-tag"
+                            styleClass="dark:!bg-surface-900 text-xs" />
+                        <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(pub.id)"
+                            direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
+                    </div>
+
+                    <footer>
+                        <div class="pub-name">{{ pub.name }}</div>
+                    </footer>
+
+                </div>
+            </ng-template>
+        </p-carousel>
+    </div>
+</div>

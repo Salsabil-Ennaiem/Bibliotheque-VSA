@@ -1,0 +1,99 @@
+<div class="container-fluid py-4">
+  <!-- Objectif 1: Optimiser le Catalogue -->
+  <h2 class="section-title">Optimiser le Catalogue</h2>
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <p-card header="Nombre d'emprunts par livre " styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="bar" [data]="topBooksData" [options]="barOptions"></p-chart>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-lg-6">
+      <p-card header="Taux de rotation par catégorie" styleClass="custom-card paired-chart">
+        <p-select [options]="categories" [(ngModel)]="selectedCategory" placeholder="Sélectionner une catégorie" styleClass="custom-select" (onChange)="updateRotationChart()"></p-select>
+        <div class="chart-container">
+          <p-chart type="line" [data]="rotationData" [options]="lineOptions"></p-chart>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Objectif 2: Réduire les Retards -->
+  <h2 class="section-title">Réduire les Retards</h2>
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <p-card header="Taux de retards" styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="doughnut" [data]="delayRateData" [options]="doughnutOptions"></p-chart>
+        </div>
+        <p class="kpi-text">Taux de retards : {{ delayRate }}%</p>
+      </p-card>
+    </div>
+    <div class="col-lg-6">
+      <p-card header="Utilisateurs avec retards fréquents" styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="bar" [data]="frequentDelaysData" [options]="barOptions"></p-chart>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Objectif 3: Analyser les Pertes -->
+  <h2 class="section-title">Analyser les Pertes</h2>
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <p-card header="Taux de sanction (Retards et  Pertes)" styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="bar" [data]="sanctionData" [options]="stackedBarOptions"></p-chart>
+        </div>
+        <p class="kpi-text">Taux de sanction : {{ sanctionRate }}%</p>
+      </p-card>
+    </div>
+    <div class="col-lg-6">
+      <p-card header="Coût des pertes" styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="line" [data]="lossCostData" [options]="lineWithThresholdOptions"></p-chart>
+        </div>
+        <p class="kpi-text">Coût total des pertes : {{ lossCost }} €</p>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Objectif 4: Planifier les Ressources -->
+  <h2 class="section-title">Planifier les Ressources (Pic d’Emprunts)</h2>
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <p-card header="Nombre d'emprunts par mois" styleClass="custom-card paired-chart">
+        <div class="chart-container">
+          <p-chart type="line" [data]="monthlyLoansData" [options]="lineOptions"></p-chart>
+        </div>
+        <p class="kpi-text">Total des emprunts : {{ totalLoans }}</p>
+      </p-card>
+    </div>
+    <div class="col-lg-6">
+      <p-card header="Durée moyenne d'emprunt" styleClass="custom-card paired-chart">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <p-card styleClass="metric-card">
+              <h5>{{ averageLoanDuration }} jours</h5>
+              <p>Durée moyenne</p>
+            </p-card>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Objectif 5: Évaluer les Politiques -->
+  <h2 class="section-title">Évaluer les Politiques</h2>
+  <div class="row mb-4">
+    <div class="col-lg-6 offset-lg-3">
+      <p-card header="Taux de retard avant et après politique" styleClass="custom-card single-chart">
+        <div class="chart-container">
+          <p-chart type="line" [data]="policyImpactData" [options]="doubleLineOptions"></p-chart>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

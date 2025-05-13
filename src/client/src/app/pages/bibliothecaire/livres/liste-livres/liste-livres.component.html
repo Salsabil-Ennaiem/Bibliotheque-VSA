@@ -1,0 +1,120 @@
+<div class="container p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Liste des Livres</h1>
+        <div class="d-flex align-items-center gap-2">
+            <p-button *ngIf="!isHosted" label="Ajouter" icon="pi pi-plus" styleClass="p-button-sm p-button-success"
+                routerLink="ajouter">
+            </p-button>
+          <!--  <p-select [options]="statut_liv" [(ngModel)]="selectedStatut" optionLabel="label" filter="true"
+                filterBy="label" filterPlaceholder="Rechercher statut" placeholder="Filtrer par statut"
+                class="w-100 select-width" showClear="true" (onChange)="handleStatutChange()">
+            </p-select>
+            <p-select [options]="etat_liv" [(ngModel)]="selectedEtat" optionLabel="label" filter="true"
+                filterBy="label" filterPlaceholder="Rechercher état" placeholder="Filtrer par état"
+                class="w-100 select-width" showClear="true" (onChange)="handleEtatChange()">
+            </p-select> -->
+            <div id="search-container" class="position-relative w-100" style="max-width: 20rem;">
+                <div *ngIf="isInputVisible; else buttonTemplate">
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-search" />
+                        <input type="text" pInputText placeholder="Rechercher un livre..." [(ngModel)]="searchQuery"
+                            (input)="handleSearch($event)" class="w-100" />
+                    </p-iconfield>
+                </div>
+                <ng-template #buttonTemplate>
+                    <p-button icon="pi pi-search" styleClass="p-button-text" (click)="toggleInput()"></p-button>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+
+    <div class="book-grid " >
+        <ng-container *ngIf="searchResults.length === 0 && (searchQuery || selectedStatut || selectedEtat); else resultsGrid">
+            <p class="text-center text-muted">Aucun livre trouvé</p>
+        </ng-container>
+        <ng-template #resultsGrid>
+            <ng-container *ngIf="searchResults.length > 0; else defaultGrid">
+                <div class="row row-cols-1 row-cols-sm-3 g-4">
+                    <div *ngFor="let livre of searchResults" class="col">
+                        <div class="book" [ngClass]="{ 'open': livre.isOpen }" (click)="toggleBook(livre, $event)">
+                            <div class="back"></div>
+                            <div class="page6"></div>
+                            <div class="page5"></div>
+                            <div class="page4"></div>
+                            <div class="page3"></div>
+                            <div class="page2">
+                                <div class="page-details">
+                                    <p class="mb-2"><strong>ISBN :</strong> {{ livre.ISBN }}</p>
+                                    <p class="mb-2"><strong>État:</strong> {{ livre.etat_liv }}</p>
+                                    <p class="mb-2"><strong>cote:</strong> {{ livre.cote_liv }}</p>
+                                    <p class="mb-2"><strong>invtentaire:</strong> {{ livre.invtentaire }}</p>
+                                </div>
+                            </div>
+                            <div class="page1"></div>
+                            <div class="front">
+                                <img [src]="livre.couverture" [alt]="livre.title" class="book-image" />
+                                <div class="book-details">
+                                    <h3 class="book-title">{{ livre.title }}</h3>
+                                    <p class="book-author">{{ livre.author }}</p>
+                                    <p>{{livre.editeur}}</p>
+                                    <p class="book-date">{{ livre.date_edition }}</p>
+                                    <span class="badge position-absolute top-0 start-0 m-2"
+                                          [ngClass]="{
+                                            'bg-success': livre.statut_liv === 'Disponible',
+                                            'bg-warning': livre.statut_liv === 'Emprunté',
+                                            'bg-danger': livre.statut_liv === 'Perdu'
+                                          }">
+                                        {{ livre.statut_liv }}
+                                    </span>
+                                </div>
+                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id)"
+                                    direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-template #defaultGrid>
+                <div class="row row-cols-1 row-cols-sm-3 g-4">
+                    <div *ngFor="let livre of livres" class="col">
+                        <div class="book" [ngClass]="{ 'open': livre.isOpen }" (click)="toggleBook(livre, $event)">
+                            <div class="back"></div>
+                            <div class="page6"></div>
+                            <div class="page5"></div>
+                            <div class="page4"></div>
+                            <div class="page3"></div>
+                            <div class="page2">
+                                <div class="page-details">
+                                    <p class="mb-2"><strong>ISBN :</strong> {{ livre.ISBN }}</p>
+                                    <p class="mb-2"><strong>État:</strong> {{ livre.etat_liv }}</p>
+                                    <p class="mb-2"><strong>cote:</strong> {{ livre.cote_liv }}</p>
+                                    <p class="mb-2"><strong>invtentaire:</strong> {{ livre.invtentaire }}</p>
+                                </div>
+                            </div>
+                            <div class="page1"></div>
+                            <div class="front">
+                                <img [src]="livre.couverture" [alt]="livre.title" class="book-image" />
+                                <div class="book-details">
+                                    <h3 class="book-title">{{ livre.title }}</h3>
+                                    <p class="book-author">{{ livre.author }}</p>
+                                    <p class="book-editeur">{{livre.editeur}}</p>
+                                    <p class="book-date">{{ livre.date_edition }}</p>
+                                    <span class="badge position-absolute top-0 start-0 m-2"
+                                          [ngClass]="{
+                                            'bg-success': livre.statut_liv === 'Disponible',
+                                            'bg-warning': livre.statut_liv === 'Emprunté',
+                                            'bg-danger': livre.statut_liv === 'Perdu'
+                                          }">
+                                        {{ livre.statut_liv }}
+                                    </span>
+                                </div>
+                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id)"
+                                    direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </ng-template>
+    </div>
+</div>

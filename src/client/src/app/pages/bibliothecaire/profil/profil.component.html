@@ -1,0 +1,125 @@
+<p-drawer header="Profil" [(visible)]="visible" position="right" (onHide)="onDrawerHide()">
+  <ng-template pTemplate="header">
+    <div class="d-flex align-items-center gap-2">
+      <i class="pi pi-user"></i>
+    </div>
+  </ng-template>
+
+  <div class="p-4 d-flex flex-column gap-4">
+
+    <div class="field d-flex flex-column align-items-center">
+      <label class="form-label">Photo de profil</label>
+
+      @if (!isEditing) {
+
+      <div class="avatar-container mb-3 rounded-circle overflow-hidden border border-3">
+        @if (imageUrl) {
+        <img [src]="imageUrl" alt="Avatar" class="w-100 h-100 object-fit-cover">
+        }
+        @else {
+        <div class="avatar-placeholder w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+          <i class="pi pi-user fs-1 text-secondary"></i>
+        </div>
+        }
+
+      </div>
+      }
+
+      @else{
+
+      <div class="avatar-container mb-3 rounded-circle overflow-hidden border border-3">
+        @if (newImagePreview) {
+        <img [src]="newImagePreview" alt="Nouvel avatar" class="w-100 h-100 object-fit-cover">
+        } @else {
+        <img [src]="imageUrl" alt="Avatar actuel" class="w-100 h-100 object-fit-cover">
+        }
+      </div>
+      <p-button label="Upload" icon="pi pi-upload" (click)="triggerFileInput()" type="button"></p-button>
+      <input #fileInput type="file" accept="image/*" (change)="handleFileUpload($event)" style="display: none;" />
+      }
+
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label">Nom</label>
+        @if (!isEditing) {
+        <input pInputText [(ngModel)]="nom" disabled="true" class="form-control">
+        } @else {
+        <input pInputText [(ngModel)]="editableNom" class="form-control">
+        }
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label class="form-label">Prénom</label>
+        @if (!isEditing) {
+        <input pInputText [(ngModel)]="prenom" disabled="true" class="form-control">
+        } @else {
+        <input pInputText [(ngModel)]="editablePrenom" class="form-control">
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="col-12">
+        <label class="form-label">Email</label>
+        @if (!isEditing) {
+        <input pInputText [(ngModel)]="email" disabled="true" class="form-control">
+        } @else {
+        <input pInputText type="email" [(ngModel)]="editableEmail" class="form-control">
+        }
+      </div>
+
+      <!-- Téléphone -->
+      <div class="col-12">
+        <label class="form-label">Téléphone</label>
+        @if (!isEditing) {
+        <input pInputText [(ngModel)]="telephone" disabled="true" class="form-control">
+        } @else {
+        <input pInputText type="tel" [(ngModel)]="editableTelephone" class="form-control">
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <label class="form-label">Description</label>
+        @if (!isEditing) {
+        <textarea pTextarea disabled="true" [(ngModel)]="description" rows="3" class="form-control"></textarea>
+        } @else {
+        <textarea pTextarea [(ngModel)]="editableDescription" rows="3" class="w-full"></textarea>
+        }
+      </div>
+
+      <!-- Mot de passe -->
+      @if (isEditing) {
+      <div class="col-12">
+        <label class="form-label">Ancien Mot de passe</label>
+        <input pInputText type="password" [(ngModel)]="oldpassword" class="form-control">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Nouveau mot de passe</label>
+        <input pInputText type="password" [(ngModel)]="editablePassword" class="form-control">
+      </div>
+      }
+      @else { <div class="col-12">
+        <label class="form-label"> Mot de passe</label>
+        <input pInputText type="password" disabled="true" [(ngModel)]="oldpassword" class="form-control">
+      </div>}
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="d-flex justify-content-between">
+      @if (!isEditing) {
+      <p-button label="Modifier" icon="pi pi-pencil" (click)="startEditing()">
+      </p-button>
+      } @else {
+      <div class="d-flex gap-2">
+        <p-button label="Annuler" severity="secondary" (click)="cancelEditing()">
+        </p-button>
+        <p-button label="Enregistrer" (click)="saveChanges()">
+        </p-button>
+      </div>
+      }
+    </div>
+  </ng-template>
+</p-drawer>

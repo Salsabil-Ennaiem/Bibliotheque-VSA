@@ -1,0 +1,23 @@
+@import "primeicons/primeicons.css";
+:root {
+    --primary-color: #4a6491;
+    --secondary-color: #a777e3;
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --card-color: #ffffff;
+  }
+  
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+  }
+  
+  .card {
+    background-color: var(--card-color);
+    color: var(--text-color);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+  }

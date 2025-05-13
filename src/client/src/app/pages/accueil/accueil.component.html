@@ -1,0 +1,91 @@
+<div class="main-container d-flex flex-column min-vh-100" [ngClass]="{'dark-theme': isDarkMode}">
+  <!-- Header -->
+  <header [ngClass]="{'sticky': isSticky, 'rounded': !isSticky}" class="header-container">
+    <div class="container-fluid d-flex justify-content-between align-items-center p-3">
+      <!-- Logo -->
+      <div class="logo">
+        <a href="/accueil">
+          <img src="images/iconPg.png" alt="Logo" height="40">
+        </a>
+      </div>
+
+      <!-- Welcome Message -->
+      @if (!isSticky) {
+      <h2 class="m-0 welcome-text">Bienvenu</h2>
+      }
+
+      <!-- Theme Toggle and Login -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Theme Toggle -->
+        <div class="theme-toggle-container">
+          <div pRipple class="theme-toggle d-flex align-items-center justify-content-between px-2"
+            (click)="toggleTheme()">
+            <span class="theme-icon" [ngClass]="{'active': !isDarkMode}">
+              <i class="pi pi-sun"></i>
+            </span>
+            <span class="theme-icon" [ngClass]="{'active': isDarkMode}">
+              <i class="pi pi-moon"></i>
+            </span>
+            <span class="slider" [ngClass]="{'dark': isDarkMode}"></span>
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <button pButton icon="pi pi-user" [label]="isSticky ? '' : 'Se Connecter'" class="p-button-rounded"
+          [ngClass]="{'p-button-sm': isSticky}" routerLink="/compte/login"></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body Content -->
+  <main class="content flex-grow-1">
+    <div class="container py-4">
+      <!-- Your main content will go here -->
+      <div class="content-container">
+        <div class="component-wrapper">
+          <app-liste-nouveaute [isHosted]="true"></app-liste-nouveaute>
+        </div>
+        <div class="component-wrapper">
+          <app-liste-livres [isHosted]="true"></app-liste-livres>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  @if (isSticky) {
+  <button pButton icon="pi pi-arrow-up" class="p-button-rounded back-to-top" pRipple (click)="scrollToTop()"></button>
+  }
+
+  <!-- Footer -->
+  <footer class="footer mt-auto">
+    <div class="container text-center py-5">
+      <!-- Social/Contact Icons -->
+      <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+        <a pRipple href="https://www.facebook.com/ISGSOUSSE.TN/"
+          class="d-flex align-items-center justify-content-center rounded-circle icon-link" aria-label="Facebook">
+          <i class="pi pi-facebook"></i>
+        </a>
+        <a pRipple href="tel:+21673332976"
+          class="d-flex align-items-center justify-content-center rounded-circle icon-link" aria-label="Phone">
+          <i class="pi pi-phone"></i>
+        </a>
+        <a pRipple
+          href="https://www.google.com/maps/dir//ISG+Sousse,+Sousse+Higher+Institute+of+Management,+Sousse/@35.8151292,10.5868264,5790m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x1302753fa36da12f:0xcc8c27a6938b3c92!2m2!1d10.6256693!2d35.8141437?entry=ttu&g_ep=EgoyMDI1MDMzMS4wIKXMDSoASAFQAw%3D%3D"
+          target="_blank" class="d-flex align-items-center justify-content-center rounded-circle icon-link"
+          aria-label="Address">
+          <i class="pi pi-map-marker"></i>
+        </a>
+        <a pRipple href="mailto:isgs@isgs.rnu.tn"
+          class="d-flex align-items-center justify-content-center rounded-circle icon-link" aria-label="Email">
+          <i class="pi pi-envelope"></i>
+        </a>
+      </div>
+
+      <!-- Description Phrase -->
+      <p class="footer-description mx-auto mb-4">
+        Le site de la bibliothèque de la faculté IGS est une plateforme en ligne qui permet aux étudiants et au
+        personnel de rechercher des livres disponibles dans la bibliothèque.
+      </p>
+    </div>
+  </footer>
+</div>

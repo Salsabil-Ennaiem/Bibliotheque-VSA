@@ -1,0 +1,37 @@
+.header-container {
+    transition: all 0.3s ease;
+    background-color: #ffffff85;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+  
+  .header-container.rounded {
+    border-radius: 0 0 80px 80px;
+    width: 95%;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+  
+  .header-container.sticky {
+    width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .back-to-top {
+  transition: all 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  z-index: 1000;
+}
+
+.child-container {
+  padding-top: 110px;
+}

@@ -1,0 +1,31 @@
+    <header [ngClass]="{'sticky': isSticky, 'rounded': !isSticky}" class="header-container">
+      <div class="container-fluid d-flex justify-content-between align-items-center p-3">
+        <div class="">
+          <a routerLink="/bibliothecaire/">
+            <img src="images/iconPg.png" alt="Logo" height="40">
+          </a>
+          <button pButton icon="pi pi-book" label="Livres" class="p-button-text "  routerLink="/bibliothecaire/livres"></button>
+          <button pButton icon="pi pi-inbox" label="Emprunts" class="p-button-text" routerLink="/bibliothecaire/emprunts" ></button>
+          <button pButton icon="pi pi-ban" label="Sanctions" class="p-button-text" routerLink="/bibliothecaire/sanctions"></button>
+          <button pButton icon="pi pi-sparkles" label="Nouveautes" class="p-button-text" routerLink="/bibliothecaire/nouveaute" ></button>
+        </div>
+  
+          <div class="d-flex align-items-center gap-3">
+          <button pButton icon="pi pi-bell" rounded="true" class="p-button-text" (click)="showNotification()"></button>
+          <button pButton icon="pi pi-user" rounded="true" class="p-button-text"  (click)="showProfile()"></button>
+          <button pButton icon="pi pi-cog" rounded="true" class="p-button-text"  (click)="showParametres()"></button>
+          <button pButton icon="pi pi-sign-out" [label]="isSticky ? '' : 'Logout'" class="p-button-rounded" [ngClass]="{'p-button-sm': isSticky}" routerLink="/"></button>
+        </div>
+      </div>
+    </header>     
+
+    <app-parametre [(visible)]="showParametre"></app-parametre>
+    <app-profil [(visible)]="showProfil"></app-profil>
+   
+<div class="child-container">
+
+<router-outlet ></router-outlet>
+</div>
+@if (isSticky) {
+  <button pButton icon="pi pi-arrow-up" class="p-button-rounded back-to-top" pRipple (click)="scrollToTop()"></button>
+  }

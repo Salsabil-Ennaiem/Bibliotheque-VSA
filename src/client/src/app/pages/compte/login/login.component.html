@@ -1,0 +1,49 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100 p-3">
+    <div class="rounded-4 shadow" style="background-color: rgba(195, 242, 191, 0.188); width: 100%; max-width: 500px;">
+      <div class="header p-5 pb-4 border-bottom-0">
+        <p-button icon="pi pi-home"  routerLink="/" [rounded]="true" [text]="true" [raised]="true"  size="large" ></p-button>
+        <h1 class="text-center fw-bold">Login</h1>
+      </div>
+  
+      <div class="p-5 pt-0">
+        <form id="loginForm" (ngSubmit)="OnLogin()">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <span class=" w-100">
+                    <p-iconfield>
+                    <p-inputicon  class="pi pi-envelope"/>
+                    <input pInputText id="email" type="email" [(ngModel)]="loginObj.emailId" class="w-100" name="email" placeholder="name@example.com">
+                    </p-iconfield>
+                </span>
+            </div>
+  
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <span class=" w-100">
+                <p-iconfield>
+                <p-inputicon  class="pi pi-lock"/>
+                <input pInputText id="password" [(ngModel)]="loginObj.password" type="password" class="w-100" name="password" placeholder="password">
+                </p-iconfield>
+            </span>
+        </div>
+          <p-button label="Login"  styleClass="w-100 mb-12" (click)="OnLogin()" [raised]="true" ></p-button>
+          <small class="text-body-secondary d-block text-center">
+            <a routerLink="../motDePasseOublie">Mot de Passe Oubliée</a>
+          </small>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!--  loginObj:Bibliothecaire = new Bibliothecaire();
+  private biblioServ: BibliothecaireService;
+
+  constructor(biblioServ: BibliothecaireService) {
+    this.biblioServ = biblioServ;
+  }
+
+  OnLogin() {
+    this.biblioServ.login(this.loginObj).subscribe((res:IBibliothecaireModel) => {
+      alert("user ok");})
+    }
+      -->
