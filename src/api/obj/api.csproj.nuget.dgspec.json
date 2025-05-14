@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\salsa\\Desktop\\pfe\\Biblio VSA\\src\\api\\api.csproj": {}
+    "C:\\Users\\salsa\\Desktop\\pfe\\dvp\\Biblio VSA\\src\\api\\api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\salsa\\Desktop\\pfe\\Biblio VSA\\src\\api\\api.csproj": {
+    "C:\\Users\\salsa\\Desktop\\pfe\\dvp\\Biblio VSA\\src\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\salsa\\Desktop\\pfe\\Biblio VSA\\src\\api\\api.csproj",
+        "projectUniqueName": "C:\\Users\\salsa\\Desktop\\pfe\\dvp\\Biblio VSA\\src\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "C:\\Users\\salsa\\Desktop\\pfe\\Biblio VSA\\src\\api\\api.csproj",
+        "projectPath": "C:\\Users\\salsa\\Desktop\\pfe\\dvp\\Biblio VSA\\src\\api\\api.csproj",
         "packagesPath": "C:\\Users\\salsa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\salsa\\Desktop\\pfe\\Biblio VSA\\src\\api\\obj\\",
+        "outputPath": "C:\\Users\\salsa\\Desktop\\pfe\\dvp\\Biblio VSA\\src\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\salsa\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -46,6 +46,22 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.16, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.16, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "target": "Package",
+              "version": "[8.0.16, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
