@@ -4,7 +4,7 @@ using Data;
 using domain.Entity;
 
 
-namespace presistence.Extentions;
+namespace Infrastructure.Extentions;
 
 public static class ServiceICollectionExtentions
 {

@@ -113,3 +113,6 @@ C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\obj\Debug\net8.0\refint\api.dl
 C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\obj\Debug\net8.0\api.pdb
 C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\obj\Debug\net8.0\ref\api.dll
+C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\bin\Debug\net8.0\HtmlAgilityPack.dll
+C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\bin\Debug\net8.0\MediatR.dll
+C:\Users\salsa\Desktop\pfe\dvp\Biblio VSA\src\api\bin\Debug\net8.0\MediatR.Contracts.dll

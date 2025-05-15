@@ -14,7 +14,7 @@ namespace api.Migrations
 {
     [DbContext(typeof(BiblioDbContext))]
     [Migration("20250514130623_createbd")]
-    partial class createbd
+    partial class CreateBd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

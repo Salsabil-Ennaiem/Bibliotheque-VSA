@@ -1,7 +1,4 @@
-using Data;
-using domain.Entity;
-using presistence.Extentions;
-//using Seeders;
+using Infrastructure.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +10,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddPersistenceServices(builder.Configuration);
+
+
+builder.Services.AddBiruniServices(builder.Configuration);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>{
+    c.SwaggerDoc("v1", new() { Title = "Biruni Scraper", Version = "v1" });});
+
 
 var app = builder.Build();
 
@@ -28,7 +32,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.MapIdentityApi<Bibliothecaire>();
+//app.MapIdentityApi<Bibliothecaire>();
 
 app.MapControllers();
 
