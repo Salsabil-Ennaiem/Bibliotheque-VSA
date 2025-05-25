@@ -14,11 +14,12 @@ public static class DataSeeder
             var userManager = serviceProvider.GetRequiredService<UserManager<Bibliothecaire>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            var roleExists = await roleManager.RoleExistsAsync("Bibliothecaire");
+            var roleExists = await roleManager.RoleExistsAsync("ADMIN")&& await roleManager.RoleExistsAsync("Bibliothecaire");
             if (!roleExists)
             {
                 await roleManager.CreateAsync(new IdentityRole("Bibliothecaire"));
-                Console.WriteLine("Created 'Bibliothecaire' role");
+                 await roleManager.CreateAsync(new IdentityRole("ADMIN"));
+                Console.WriteLine("Created 'Bibliothecaire , ADMIN' role");
             }
 
             var users = new List<(string email, string password, string nom, string prenom)>
@@ -47,7 +48,7 @@ public static class DataSeeder
 
                     if (result.Succeeded)
                     {
-                        await userManager.AddToRoleAsync(newUser, "Admin");
+                        await userManager.AddToRoleAsync(newUser, "Bibliothecaire");
                         Console.WriteLine($"✅ Seeded user {email}");
                         createdUserIds.Add(newUser.Id);
                     }

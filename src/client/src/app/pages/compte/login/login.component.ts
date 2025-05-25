@@ -2,13 +2,13 @@ import { Component , inject} from '@angular/core';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import {  FormsModule } from '@angular/forms';
+import {  FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Router, RouterLink } from '@angular/router';
-import { Bibliothecaire, IBibliothecaireModel } from '../../../model/bibliothecaire.model';
-import { BibliothecaireService } from '../../../Services/bibliothecaire.service';
+
+import { AuthService } from '../../../Services/auth.service';
 
 
 
@@ -33,10 +33,33 @@ export class LoginComponent {
       error=>{
         alert("user not ok");})
     }*/
-    loginObj:Bibliothecaire = new Bibliothecaire();
+ 
+  loginObj = { emailId: '', password: '' };
+  isLoading = false;
+  errorMessage = '';
 
-   OnLogin() {
-console.log("login ok");
+  constructor(private authService: AuthService) {}
+
+  OnLogin() {
+    this.isLoading = true;
+    this.authService.login(this.loginObj.emailId, this.loginObj.password)
+      .subscribe({
+        error: (err: unknown) => {
+          this.errorMessage = this.getErrorMessage(err);
+          this.isLoading = false;
+        }      });
   }
-  
+
+  private getErrorMessage(err: any): string {
+    if (err.status === 401) return 'Email/mot de passe incorrect';
+    if (err.status === 423) return 'Compte verrouillé';
+    return 'Erreur serveur';
+  }
+ loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)])
+  });
+
 }
+  
+
