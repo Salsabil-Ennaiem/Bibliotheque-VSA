@@ -27,16 +27,17 @@ public class LivreConfiguration : IEntityTypeConfiguration<Livres>
            .IsRequired();           
         
 
-
         entity.Property(e => e.isbn)
-            .HasMaxLength(13);
+            .HasMaxLength(18);
 
         entity.Property(e => e.couverture)
             .HasMaxLength(200);
 
         entity.Property(e => e.auteur)
             .HasMaxLength(100);
-
+       
+        entity.Property(e => e.Langue)
+            .HasMaxLength(13);
 
 
         entity.HasIndex(e => e.isbn)

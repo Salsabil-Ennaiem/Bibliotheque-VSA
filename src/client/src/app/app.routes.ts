@@ -20,6 +20,8 @@ import { AjoutLivresComponent } from './pages/bibliothecaire/livres/ajout-livres
 import { ModifierLivresComponent } from './pages/bibliothecaire/livres/modifier-livres/modifier-livres.component';
 import { ErreurComponent } from './pages/erreur/erreur.component';
 import { SanctionsComponent } from './pages/bibliothecaire/sanctions/sanctions.component';
+import { AjoutSanctionComponent } from './pages/bibliothecaire/sanctions/ajout-sanction/ajout-sanction.component';
+import { ListSanctionsComponent } from './pages/bibliothecaire/sanctions/list-sanctions/list-sanctions.component';
 
 
 export const routes: Routes = [
@@ -33,7 +35,12 @@ export const routes: Routes = [
     {path:'bibliothecaire' , component:BibliothecaireComponent ,
       children:[
         {path:'',component:TableauxDeBordComponent},
-        {path:'sanctions' , component:SanctionsComponent},
+        {path:'sanctions' , component:SanctionsComponent ,
+          children:[
+             {path:'',component:ListSanctionsComponent },
+            {path:'ajouter',component:AjoutSanctionComponent }
+          ]
+        } ,
         {path:'nouveaute', component :NouveauteComponent ,
           children:[
             {path:'',component:ListeNouveauteComponent },

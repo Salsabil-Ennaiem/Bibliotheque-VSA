@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, viewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SpeedDialModule } from 'primeng/speeddial';
@@ -193,8 +193,31 @@ export class ListeEmpruntsComponent implements OnInit {
     }
   }
 
+@ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   importer() {
-    console.log('Importer: Trigger file upload and send to backend');
+    this.fileInput.nativeElement.click();
+  }
+
+        handleFileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+
+    if (!file.type.match(/application\/(vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet)/)) {
+      console.log('Selected file:', file.name, file.type, file.size);
+
+      alert('Veuillez sélectionner un fichier Excel (.xls ou .xlsx).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.fileInput = e.target.result;
+    };
+
+
+    reader.readAsBinaryString(file);
   }
 
   exporter() {

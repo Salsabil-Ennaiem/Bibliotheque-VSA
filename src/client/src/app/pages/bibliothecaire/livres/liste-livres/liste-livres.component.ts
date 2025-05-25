@@ -1,4 +1,4 @@
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -272,6 +272,35 @@ editeur : 'Gallimard',
     ];
   }
 
+@ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  importer() {
+    this.fileInput.nativeElement.click();
+  }
+
+        handleFileUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+
+    if (!file.type.match(/application\/(vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet)/)) {
+      console.log('Selected file:', file.name, file.type, file.size);
+
+      alert('Veuillez sélectionner un fichier Excel (.xls ou .xlsx).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.fileInput = e.target.result;
+    };
+
+
+    reader.readAsBinaryString(file);
+  }
+  exporter() {
+    console.log('Exporter: Generate CSV and trigger download');
+  }
 
   editLivre(livreId: string) {
     console.log(`Edit livre ID: ${livreId}`);
@@ -293,4 +322,6 @@ editeur : 'Gallimard',
     const searchContainer = document.getElementById('search-container');
     return searchContainer ? searchContainer.contains(event.target as Node) : false;
   }
+
+
 }

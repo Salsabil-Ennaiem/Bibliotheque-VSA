@@ -252,7 +252,7 @@ namespace api.Migrations
                     b.Property<DateTime>("date_emp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2025, 5, 14, 13, 6, 22, 602, DateTimeKind.Utc).AddTicks(5370));
+                        .HasDefaultValue(new DateTime(2025, 5, 25, 0, 38, 22, 566, DateTimeKind.Utc).AddTicks(3674));
 
                     b.Property<DateTime?>("date_retour_prevu")
                         .HasColumnType("timestamp with time zone");
@@ -316,6 +316,13 @@ namespace api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Langue")
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)");
+
                     b.Property<string>("auteur")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -338,8 +345,8 @@ namespace api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("isbn")
-                        .HasMaxLength(13)
-                        .HasColumnType("character varying(13)");
+                        .HasMaxLength(18)
+                        .HasColumnType("character varying(18)");
 
                     b.Property<string>("titre")
                         .IsRequired()

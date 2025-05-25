@@ -5,6 +5,14 @@
             <p-button *ngIf="!isHosted" label="Ajouter" icon="pi pi-plus" styleClass="p-button-sm p-button-success"
                 routerLink="ajouter">
             </p-button>
+                        <p-button *ngIf="!isHosted" label="Exporter" icon="pi pi-download" (click)="exporter()"  styleClass="p-button-sm p-button-success">
+            </p-button>
+                        <p-button *ngIf="!isHosted" label="Importer"  icon="pi pi-upload" (click)="importer()" styleClass="p-button-sm p-button-success">
+            </p-button>      <input #fileInput type="file" accept=".xlsx,.xls" (change)="handleFileUpload($event)" style="display: none;" />
+
+
+
+     
           <!--  <p-select [options]="statut_liv" [(ngModel)]="selectedStatut" optionLabel="label" filter="true"
                 filterBy="label" filterPlaceholder="Rechercher statut" placeholder="Filtrer par statut"
                 class="w-100 select-width" showClear="true" (onChange)="handleStatutChange()">

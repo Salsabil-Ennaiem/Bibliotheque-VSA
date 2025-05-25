@@ -1,0 +1,59 @@
+    <div class="top-controls d-flex justify-content-center align-items-center mb-4 gap-3 flex-wrap">
+      <h1 class="m-0">Liste des Sanctions</h1>
+      <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label" optionValue="value"
+                placeholder="Filtrer par statut" styleClass="w-auto" (onChange)="applyFilter()">
+      </p-select>
+      <button pButton icon="pi pi-plus" routerLink="ajouter" class="btn btn-primary">
+        <span class="d-none d-md-inline">Ajouter</span>
+      </button>
+
+      <div id="search-container" class="position-relative w-100 d-md-inline " style="max-width: 20rem;">
+        <div *ngIf="isInputVisible; else buttonTemplate">
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input type="text" pInputText placeholder="Rechercher un livre..." [(ngModel)]="searchQuery"
+                    (input)="handleSearch($event)" class="w-100" />
+            </p-iconfield>
+        </div>
+        <ng-template #buttonTemplate>
+            <p-button icon="pi pi-search" styleClass="p-button-text" (click)="toggleInput()"></p-button>
+        </ng-template>
+    </div>
+
+    </div>
+<div class="container mt-4">
+    <div class="row g-4">
+        <div class="col-md-4" *ngFor="let emprunt of filteredEmprunts">
+            <div class="flip-card" (click)="toggleFlip(emprunt.id)">
+                <div class="flip-card-inner" [class.flipped]="emprunt.isFlipped">
+                    <!-- Front of the card -->
+                    <div class="flip-card-front">
+                        <p-card styleClass="shadow-2 h-100">
+                            <div class="p-4 text-center position-relative">
+                                <h3 class="mb-3">Emprunt #{{ emprunt.id }}</h3>
+                                <p><strong>Id Emprunteur  :</strong> {{ emprunt.id_Emprunteur }} TDN </p>
+                                <p><strong>Cote livre :</strong> {{ emprunt.Cote_Liv  }}</p>
+                                <p><strong>Statut :</strong> {{ emprunt.statut }}</p>
+                                <p><strong>date retoure prevu  :</strong> {{ emprunt.DateRetourePrevu | date:'dd/MM/yyyy' }}</p>
+                                <!-- Speed Dial -->
+
+                            </div>
+                        </p-card>
+                    </div>
+                    <!-- Back of the card -->
+                    <div class="flip-card-back">
+                        <p-card styleClass="shadow-2 h-100">
+                            <div class="p-4 text-center">
+                                <h3 class="mb-3">Détails Emprunt #{{ emprunt.id }}</h3>
+                                <p><strong>date emprunt :</strong> {{ emprunt.Date_Emprunt | date:'dd/MM/yyyy' }} mois</p>
+                                <p><strong>date Effectif :</strong> {{ emprunt.Date_Effectif| date:'dd/MM/yyyy' }} TDN </p>
+                                <p><strong>Note :</strong> {{ emprunt.Note }}</p>
+                            </div>
+                        </p-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

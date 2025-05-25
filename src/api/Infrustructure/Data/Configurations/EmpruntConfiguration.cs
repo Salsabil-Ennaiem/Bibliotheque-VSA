@@ -59,7 +59,7 @@ namespace Data.Configurations;
 
                 entity.HasMany(e => e.Sanctions)
                     .WithOne(s => s.Emprunt)
-                    .HasForeignKey(s => s.id_sanc)
+                    .HasForeignKey(s => s.id_emp)
                     .OnDelete(DeleteBehavior.SetNull);
         }
     }

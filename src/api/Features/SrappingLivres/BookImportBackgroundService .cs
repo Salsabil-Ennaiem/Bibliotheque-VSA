@@ -1,5 +1,5 @@
 
-namespace Features.ScrapingLivres;
+namespace api.Features.ScrapingLivres;
 
 public class BookImportBackgroundService : BackgroundService
 {

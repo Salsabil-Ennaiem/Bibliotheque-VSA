@@ -9,6 +9,7 @@
       </button>
       <button pButton icon="pi pi-upload" (click)="importer()" class="btn btn-secondary">
         <span class="d-none d-md-inline">Importer</span>
+           <input #fileInput type="file" accept=".xlsx,.xls" (change)="handleFileUpload($event)" style="display: none;" />
       </button>
       <button pButton icon="pi pi-download" (click)="exporter()" class="btn btn-success">
         <span class="d-none d-md-inline">Exporter</span>

@@ -1,6 +1,6 @@
 using domain.Interfaces;
 
-namespace Features.ScrapingLivres;
+namespace api.Features.ScrapingLivres;
 public sealed class ScrapingPipeline{
     private readonly BiruniHtmlExtractor _extractor;
     private readonly BookDataTransformer _transformer;

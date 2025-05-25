@@ -1,6 +1,6 @@
 using HtmlAgilityPack;
 
-namespace Features.ScrapingLivres;
+namespace api.Features.ScrapingLivres;
 
 public class BiruniHtmlExtractor : IDisposable
 {

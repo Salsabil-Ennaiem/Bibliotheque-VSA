@@ -1,0 +1,138 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100 p-3">
+    <div class="rounded-4 shadow" style="background-color: rgba(195, 242, 191, 0.188); width: 100%; max-width: 800px;">
+        <div class="header p-5 pb-4 border-bottom-0">
+            <h1 class="text-center fw-bold">Ajouter Emprunt</h1>
+        </div>
+
+        <div class="p-5 pt-0">
+            <form id="AjouterEmp" (ngSubmit)="Ajouter()">
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <!-- Livre Information -->
+                        <div class="mb-3">
+                            <label for="cote" class="form-label">Cote  Livre</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-book" />
+                                    <input pInputText id="cote" type="text" [(ngModel)]="emprunt.cote" class="w-100"
+                                        name="cote" placeholder="Ex: A39">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editeur" class="form-label">Éditeur  Livre</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-building" />
+                                    <input pInputText id="editeur" type="text" [(ngModel)]="emprunt.editeur"
+                                        class="w-100" name="editeur" placeholder="Ex: Gallimard">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="typeEmprunteur" class="form-label">Type d'Emprunteur</label>
+                            <p-select [options]="typesEmprunteur" [(ngModel)]="emprunt.typeEmprunteur"
+                                optionLabel="label" placeholder="Sélectionnez un type" styleClass="w-100"
+                                name="typeEmprunteur"></p-select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editeur" class="form-label">Date Fin D'emprunt</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-calendar-minus" />
+                                    <input pInputText id="dateFinEmp" type="date" [(ngModel)]="emprunt.dateFinEmp"
+                                        class="w-100" name="dateFinEmp">
+                                </p-iconfield>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email d'Emprunteur</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-envelope" />
+                                    <input pInputText id="email" type="email" [(ngModel)]="emprunt.email" class="w-100"
+                                        name="email" placeholder="Ex: email@example.com">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+<div class="row">  
+    <!--  (Left Side) -->
+    <div class="col-md-6 mb-3">  
+        <label for="nom" class="form-label">Nom</label>
+        <span class="w-100">
+            <p-iconfield>
+                <p-inputicon class="pi pi-user" />
+                <input pInputText id="nom" [(ngModel)]="emprunt.nom" type="text" class="w-100"
+                    name="nom" placeholder="Ex: Amara">
+            </p-iconfield>
+        </span>
+    </div>
+
+    
+    <div class="col-md-6 mb-3">  
+        <label for="prenom" class="form-label">Prénom</label>
+        <span class="w-100">
+            <p-iconfield>
+                <p-inputicon class="pi pi-user" />
+                <input pInputText id="prenom" [(ngModel)]="emprunt.prenom" type="text" class="w-100"
+                    name="prenom" placeholder="Ex: Souad">
+            </p-iconfield>
+        </span>
+    </div>
+</div>
+
+                        <div class="mb-3">
+                            <label for="cin" class="form-label">CIN ou Passeport</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-id-card" />
+                                    <input pInputText id="cin" [(ngModel)]="emprunt.cin" type="text" class="w-100"
+                                        name="cin" placeholder="Ex: AB123456">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telephone" class="form-label">Téléphone</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-phone" />
+                                    <input pInputText id="telephone" [(ngModel)]="emprunt.telephone" type="tel"
+                                        class="w-100" name="telephone" placeholder="Ex: 0612345678">
+                                </p-iconfield>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full width row for notes -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <span class="w-100">
+                                <textarea pInputTextarea id="notes" [(ngModel)]="emprunt.notes" class="w-100"
+                                    name="notes" rows="3" placeholder="Ajoutez des notes ici..."></textarea>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <p-button label="Annuler" icon="pi pi-times" styleClass="p-button-secondary" [raised]="true"
+                        (click)="Annuler()"></p-button>
+                    <p-button label="Enregistrer" icon="pi pi-check" styleClass="p-button-success" [raised]="true"
+                        (click)="Ajouter()"></p-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
