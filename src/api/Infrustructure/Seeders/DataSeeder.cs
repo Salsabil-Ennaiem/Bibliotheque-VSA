@@ -93,7 +93,7 @@ public static class DataSeeder
                 
                 var (ancienParametre, nouveauParametre) = await SeedParametresAsync(dbContext, biblio1Id, biblio2Id);
                 
-                var emprunts = await SeedEmpruntsAsync(dbContext, membres, inventaires, biblio1Id, biblio2Id);
+              var emprunts = await SeedEmpruntsAsync(dbContext, membres, inventaires, biblio1Id, biblio2Id);
                 await SeedSanctionsAsync(dbContext, emprunts, membres, biblio1Id);
                 await SeedNouveautesAsync(dbContext, biblio1Id, biblio2Id);
                 await SeedStatistiquesAsync(dbContext, ancienParametre, nouveauParametre, emprunts, membres);
@@ -273,13 +273,73 @@ public static class DataSeeder
         return membres;
     }
 
+    private static async Task SeedNouveautesAsync(BiblioDbContext dbContext, string biblio1Id, string biblio2Id)
+    {
+        var nouveautes = new List<Nouveaute>
+        {
+            new Nouveaute
+            {
+                id_nouv = Guid.NewGuid().ToString(),
+                id_biblio = biblio1Id,
+                titre = "Nouvelle Collection Informatique",
+                fichier = new Dictionary<string, object>
+                {
+                    { "type", "pdf" },
+                    { "nom", "collection_informatique_2024.pdf" },
+                    { "taille", "2.5MB" },
+                    { "url", "/files/nouveautes/collection_informatique_2024.pdf" }
+                },
+                description = "Découvrez notre nouvelle collection de livres d'informatique pour 2024. Plus de 50 nouveaux titres disponibles !",
+                date_publication = DateTime.UtcNow.AddDays(-7),
+                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
+            },
+            new Nouveaute
+            {
+                id_nouv = Guid.NewGuid().ToString(),
+                id_biblio = biblio2Id,
+                titre = "Horaires d'été 2024",
+                fichier = new Dictionary<string, object>
+                {
+                    { "type", "image" },
+                    { "nom", "horaires_ete_2024.jpg" },
+                    { "taille", "1.2MB" },
+                    { "url", "/files/nouveautes/horaires_ete_2024.jpg" }
+                },
+                description = "Nouveaux horaires d'ouverture pour la période estivale. La bibliothèque sera ouverte de 8h à 16h du lundi au vendredi.",
+                date_publication = DateTime.UtcNow.AddDays(-3),
+                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
+            },
+            new Nouveaute
+            {
+                id_nouv = Guid.NewGuid().ToString(),
+                id_biblio = biblio1Id,
+                titre = "Atelier Formation Recherche",
+                fichier = new Dictionary<string, object>
+                {
+                    { "type", "document" },
+                    { "nom", "formation_recherche_programme.docx" },
+                    { "taille", "0.8MB" },
+                    { "url", "/files/nouveautes/formation_recherche_programme.docx" }
+                },
+                description = "Inscrivez-vous à nos ateliers de formation à la recherche documentaire. Sessions tous les mardis à 14h.",
+                date_publication = DateTime.UtcNow.AddDays(-1),
+                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
+            }
+        };
+
+        await dbContext.Nouveautes.AddRangeAsync(nouveautes);
+        await dbContext.SaveChangesAsync();
+        Console.WriteLine($"✅ Seeded {nouveautes.Count} nouveautes");
+    }
+
+
     private static async Task<(Parametre ancien, Parametre nouveau)> SeedParametresAsync(BiblioDbContext dbContext, string biblio1Id, string biblio2Id)
     {
         var ancienParametre = new Parametre
         {
             id_param = Guid.NewGuid().ToString(),
             IdBiblio = biblio1Id,
-            Delais_Emprunt_Etudiant = 7, 
+            Delais_Emprunt_Etudiant = 7,
             Delais_Emprunt_Enseignant = 10,
             Delais_Emprunt_Autre = 5,
             Modele_Email_Retard = "Rappel: Votre livre [TITRE] est en retard depuis le [DATE]",
@@ -303,13 +363,13 @@ public static class DataSeeder
         return (ancienParametre, nouveauParametre);
     }
 
-       private static async Task<List<Emprunts>> SeedEmpruntsAsync(BiblioDbContext dbContext, List<Membre> membres, List<Inventaire> inventaires, string biblio1Id, string biblio2Id)
+    private static async Task<List<Emprunts>> SeedEmpruntsAsync(BiblioDbContext dbContext, List<Membre> membres, List<Inventaire> inventaires, string biblio1Id, string biblio2Id)
     {
         Console.WriteLine("🔍 Debug - Inventaires disponibles:");
-    foreach (var inv in inventaires)
-    {
-        Console.WriteLine($"  📦 Inventaire ID: {inv.id_inv} - Livre ID: {inv.id_liv}");
-    }
+        foreach (var inv in inventaires)
+        {
+            Console.WriteLine($"  📦 Inventaire ID: {inv.id_inv} - Livre ID: {inv.id_liv}");
+        }
 
         var emprunts = new List<Emprunts>
         {
@@ -368,10 +428,10 @@ public static class DataSeeder
         };
 
         Console.WriteLine("🔍 Debug - Emprunts à créer:");
-    foreach (var emp in emprunts)
-    {
-        Console.WriteLine($"  📋 Emprunt: Membre={emp.id_membre}, Inventaire={emp.Id_inv}");
-    }
+        foreach (var emp in emprunts)
+        {
+            Console.WriteLine($"  📋 Emprunt: Membre={emp.id_membre}, Inventaire={emp.Id_inv}");
+        }
 
         await dbContext.Emprunts.AddRangeAsync(emprunts);
         await dbContext.SaveChangesAsync();
@@ -433,65 +493,6 @@ public static class DataSeeder
         await dbContext.Sanctions.AddRangeAsync(sanctions);
         await dbContext.SaveChangesAsync();
         Console.WriteLine($"✅ Seeded {sanctions.Count} sanctions");
-    }
-
-    private static async Task SeedNouveautesAsync(BiblioDbContext dbContext, string biblio1Id, string biblio2Id)
-    {
-        var nouveautes = new List<Nouveaute>
-        {
-            new Nouveaute
-            {
-                id_nouv = Guid.NewGuid().ToString(),
-                id_biblio = biblio1Id,
-                titre = "Nouvelle Collection Informatique",
-                fichier = new Dictionary<string, object>
-                {
-                    { "type", "pdf" },
-                    { "nom", "collection_informatique_2024.pdf" },
-                    { "taille", "2.5MB" },
-                    { "url", "/files/nouveautes/collection_informatique_2024.pdf" }
-                },
-                description = "Découvrez notre nouvelle collection de livres d'informatique pour 2024. Plus de 50 nouveaux titres disponibles !",
-                date_publication = DateTime.UtcNow.AddDays(-7),
-                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
-            },
-            new Nouveaute
-            {
-                id_nouv = Guid.NewGuid().ToString(),
-                id_biblio = biblio2Id,
-                titre = "Horaires d'été 2024",
-                fichier = new Dictionary<string, object>
-                {
-                    { "type", "image" },
-                    { "nom", "horaires_ete_2024.jpg" },
-                    { "taille", "1.2MB" },
-                    { "url", "/files/nouveautes/horaires_ete_2024.jpg" }
-                },
-                description = "Nouveaux horaires d'ouverture pour la période estivale. La bibliothèque sera ouverte de 8h à 16h du lundi au vendredi.",
-                date_publication = DateTime.UtcNow.AddDays(-3),
-                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
-            },
-            new Nouveaute
-            {
-                id_nouv = Guid.NewGuid().ToString(),
-                id_biblio = biblio1Id,
-                titre = "Atelier Formation Recherche",
-                fichier = new Dictionary<string, object>
-                {
-                    { "type", "document" },
-                    { "nom", "formation_recherche_programme.docx" },
-                    { "taille", "0.8MB" },
-                    { "url", "/files/nouveautes/formation_recherche_programme.docx" }
-                },
-                description = "Inscrivez-vous à nos ateliers de formation à la recherche documentaire. Sessions tous les mardis à 14h.",
-                date_publication = DateTime.UtcNow.AddDays(-1),
-                couverture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1"
-            }
-        };
-
-        await dbContext.Nouveautes.AddRangeAsync(nouveautes);
-        await dbContext.SaveChangesAsync();
-        Console.WriteLine($"✅ Seeded {nouveautes.Count} nouveautes");
     }
 
      private static async Task SeedStatistiquesAsync(BiblioDbContext dbContext, Parametre ancienParametre, Parametre nouveauParametre, List<Emprunts> emprunts, List<Membre> membres)
@@ -567,4 +568,5 @@ public static class DataSeeder
         Console.WriteLine($"  📊 Période 1: {joursP1} jours - {empruntsP1.Count} emprunts - {empruntsEnRetardP1} en retard");
         Console.WriteLine($"  📊 Période 2: {joursP2} jours - {empruntsP2.Count} emprunts - {empruntsEnRetardP2} en retard");
     }
+
 }

@@ -14,6 +14,9 @@ using domain.Interfaces;
 using Infrastructure.Repositries;
 using api.Features.Livre;
 using api.Features.Nouveautes;
+using api.Features.Emprunt;
+using api.Features.Parametre;
+using api.Features.Sanction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +59,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddHttpContextAccessor();
+
 
 builder.Services.AddCors(options => {
     options.AddPolicy("Angular", policy => 
@@ -75,12 +80,20 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ILivresRepository, LivresRepository>();
-builder.Services.AddScoped<INouveauteRepository, NouveauteRepository>();
+builder.Services.AddScoped<IEmpruntsRepository, EmpruntsRepository>();
+// builder.Services.AddScoped<IParametreRepository, ParametreRepository>();
+builder.Services.AddScoped<ISanctionRepository, SanctionRepository>();
+builder.Services.AddScoped<IScrapingRepository, ScrapingRepository>();
+builder.Services.AddScoped<INouveauteRepository , NouveauteRepository>();
+
 builder.Services.AddScoped<LivresHandler>();
+builder.Services.AddScoped<EmpruntHandler>();
+//builder.Services.AddScoped<ParametreHandler>();
+builder.Services.AddScoped<SanctionHandler>();
 builder.Services.AddScoped<LoginHandler>();
-builder.Services.AddScoped<NouveauteHundler>();
+builder.Services.AddScoped<NouveauteHandler>();
 
 
 builder.Services.AddBiruniServices(builder.Configuration);

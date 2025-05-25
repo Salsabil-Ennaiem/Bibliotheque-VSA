@@ -10,25 +10,21 @@ namespace Infrastructure.Repositries
         public EmpruntsRepository(BiblioDbContext dbContext)
             : base(dbContext)
         {
+            _dbContext = dbContext;
         }
-        public async Task<Emprunts> GetByEmailAsync(string note)
+                public async Task<IEnumerable<Emprunts>> SearchAsync(string searchTerm)
         {
-            try
-            {
-                var utilisateur = await _dbContext.Set<Emprunts>().AsNoTracking().FirstOrDefaultAsync(u => u.note == note);
+            var query = from e in _dbContext.Emprunts
+                        where e.date_emp.ToString().Contains(searchTerm)
+                           || (e.Id_inv != null && e.Id_inv.Contains(searchTerm))
+                           || e.Statut_emp.ToString().Contains(searchTerm)
+                           || (e.note != null && e.note.Contains(searchTerm))
+                           || e.Membre.ToString().Contains(searchTerm)
+                        select new { Emprunts = e};
+            
 
-                if (utilisateur == null)
-                {
-                    throw new System.Exception($"Utilisateur with email {note} not found.");
-                }
-
-                return utilisateur;
-            }
-            catch (System.Exception ex)
-            {
-                throw new System.Exception($"Error fetching record with email {note}: " + ex.Message, ex);
-            }
+            var results = await query.ToListAsync();
+            return results.Select(x => x.Emprunts);
         }
-
     }
 }
