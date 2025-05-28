@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class EmpruntService {
 
-  private apiUrl = '/api/emprunts'; // Adjust the URL as needed
+  private apiUrl = '/api/emprunts'; 
 
   constructor(private http: HttpClient) {}
 
@@ -15,5 +15,4 @@ export class EmpruntService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  // Add other methods like getEmprunts(), addEmprunt(), updateEmprunt(), etc.
 }

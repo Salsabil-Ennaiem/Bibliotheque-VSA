@@ -26,9 +26,8 @@ namespace Data.Configurations;
              .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired();
 
-                entity.Property(e => e.date_fin_sanction)
-                    .HasColumnType("timestamp with time zone")
-                    .IsRequired();
+        entity.Property(e => e.date_fin_sanction)
+            .HasColumnType("timestamp with time zone");
 
                 entity.Property(e => e.montant)
                     .HasColumnType("decimal(100,3)");

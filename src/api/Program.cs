@@ -136,16 +136,36 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Appel du seeding au démarrage de l'application
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        await DataSeeder.SeedUsersAsync(services);
+        var userManager = services.GetRequiredService<UserManager<Bibliothecaire>>();
+
+        // Récupérer les utilisateurs existants
+        var users = await userManager.Users.ToListAsync();
+
+        if (users.Count >= 2)
+        {
+            // Récupérer les IDs des deux premiers bibliothécaires
+            string biblio1Id = users[0].Id;
+            string biblio2Id = users[1].Id;
+
+            // Appeler le seed complet avec les IDs récupérés
+            await DataSeeder.SeedAllDataAsync(services, biblio1Id, biblio2Id);
+        }
+        else
+        {
+            Console.WriteLine("⚠️ Moins de 2 utilisateurs trouvés, veuillez d'abord seed les utilisateurs.");
+             await UserSeeder.SeedUsersAsync(services);
+            Console.WriteLine("🌱 Seed des utilisateurs terminé.");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error during seeding: {ex.Message}");
+        Console.WriteLine($"❌ Error during seeding: {ex.Message}");
     }
 }
 
