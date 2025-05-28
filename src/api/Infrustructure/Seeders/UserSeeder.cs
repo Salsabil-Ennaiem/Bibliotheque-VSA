@@ -26,8 +26,9 @@ public class UserSeeder
                 Console.WriteLine("ℹ️ Roles already exist");
             }
 
-            var anyUsers = await userManager.Users.AnyAsync();
-            if (anyUsers)
+            var existingUsersCount = await userManager.Users.CountAsync();
+            Console.WriteLine($"📊 Nombre d'utilisateurs existants: {existingUsersCount}");
+            if (existingUsersCount >= 2)
             {
                 Console.WriteLine("ℹ️ Users already exist in database");
                 return;
@@ -35,8 +36,8 @@ public class UserSeeder
 
             var users = new List<(string email, string password, string nom, string prenom)>
             {
-                ("admin@example.com", "Admin@123", "Admin", "User"),
-                ("biblio@example.com", "Biblio@123", "Marie", "Dupont")
+                ("ennaiemsalsabil@gmail.com", "Admin@123", "Admin", "User"),
+                ("salsabinaim15@gmail.com", "Biblio@123", "Salsabil", "Naim")
             };
 
             var createdUserIds = new List<string>();

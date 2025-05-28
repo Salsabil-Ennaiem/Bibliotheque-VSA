@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using domain.Entity;
 using domain.Interfaces;
+using Mapster;
 
 
 namespace api.Features.Nouveautes
@@ -18,72 +19,66 @@ namespace api.Features.Nouveautes
             _nouveauteRepository = nouveauteRepository;
         }
 
+        private string GetCurrentUserId()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                throw new Exception("User ID not found in the claims.");
+            }
+            return userId;
+        }
+
+        public async Task<IEnumerable<NouveauteGetALL>> GetAllNouvAsync()
+        {
+            var rt = await _nouveauteRepository.GetAllNouvAsync();
+           return rt.Adapt<IEnumerable<NouveauteGetALL>>();
+
+        }
+
         public async Task<IEnumerable<NouveauteGetALL>> GetAllAsync()
         {
+            var userId = GetCurrentUserId();
             var entities = await _nouveauteRepository.GetAllAsync();
-            return entities.Select(entity => new NouveauteGetALL
-            {
-                titre = entity.titre,
-                date_publication = entity.date_publication,
-                couverture = entity.couverture,
-            });
+            var filtered = entities.Where(e => e.id_biblio == userId);
+            return filtered.Adapt<IEnumerable<NouveauteGetALL>>();
         }
 
         public async Task<NouveauteDTO> GetByIdAsync(string id)
         {
+            var userId = GetCurrentUserId();
             var entity = await _nouveauteRepository.GetByIdAsync(id);
-            return  new NouveauteDTO
+            if (entity.id_biblio != userId)
             {
-                titre = entity.titre,
-                description = entity.description,
-                date_publication = entity.date_publication,
-                couverture = entity.couverture,
-                fichier = entity.fichier
-            };
+                throw new Exception("You are not authorized to access this resource.");
+            }
+            return entity.Adapt<NouveauteDTO>();
         }
 
         public async Task<NouveauteDTO> CreateAsync(CreateNouveauteRequest createNouveaute)
         {
-              var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
-               var entity = new Nouveaute
-            {
-                id_nouv = Guid.NewGuid().ToString(),
-                id_biblio = userId,
-                titre = createNouveaute.titre,
-                description = createNouveaute.description,
-                couverture = createNouveaute.couverture,
-                fichier = createNouveaute.fichier,
-                date_publication = DateTime.UtcNow
-            };
+              var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            /* var entity = new Nouveaute
+          {
+              id_nouv = Guid.NewGuid().ToString(),
+              id_biblio = userId,
+              titre = createNouveaute.titre,
+              description = createNouveaute.description,
+              couverture = createNouveaute.couverture,
+              fichier = createNouveaute.fichier,
+              date_publication = DateTime.UtcNow
+          };*/
+            var entity = createNouveaute.Adapt<Nouveaute>();
+            entity.id_biblio=userId;
             var created = await _nouveauteRepository.CreateAsync(entity);
-            return new NouveauteDTO
-            {
-                titre = created.titre,
-                description = created.description,
-                date_publication = created.date_publication,
-                couverture = created.couverture,
-                fichier = created.fichier
-            };
+            return created.Adapt<NouveauteDTO>();
         }
 
         public async Task<NouveauteDTO> UpdateAsync(CreateNouveauteRequest nouveaute, string id)
         {
-            var entity = new Nouveaute
-            {
-                titre = nouveaute.titre,
-                description = nouveaute.description,
-                couverture = nouveaute.couverture,
-                fichier = nouveaute.fichier,
-            };
+            var entity = nouveaute.Adapt<Nouveaute>();
             var Updated = await _nouveauteRepository.UpdateAsync(entity, id);
-            return new NouveauteDTO
-            {
-                titre = Updated.titre,
-                description = Updated.description,
-                date_publication = Updated.date_publication,
-                couverture = Updated.couverture,
-                fichier = Updated.fichier
-            };
+            return Updated.Adapt<NouveauteDTO>();
         }
         public async Task DeleteAsync(string id)
         {

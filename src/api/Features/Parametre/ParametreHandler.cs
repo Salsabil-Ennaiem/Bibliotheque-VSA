@@ -1,39 +1,82 @@
 using System.Security.Claims;
-using AutoMapper;
 using domain.Entity;
+using domain.Entity.Enum;
 using domain.Interfaces;
-using Infrastructure.Repositries;
+using Mapster;
 
 namespace api.Features.Parametre;
 
 public class ParametreHandler
 {
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IParametreRepository _parametreRepository;
+    private readonly IEmpruntsRepository _empruntsRepository;
+    private readonly ISanctionRepository _sanctionRepository;
 
 
-    public ParametreHandler(IMapper mapper, IHttpContextAccessor httpContextAccessor, IParametreRepository parametreRepository)
+    public ParametreHandler(IHttpContextAccessor httpContextAccessor, ISanctionRepository sanctionRepository, IParametreRepository parametreRepository, IEmpruntsRepository empruntsRepository)
     {
-        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
         _parametreRepository = parametreRepository;
+        _empruntsRepository = empruntsRepository;
+        _sanctionRepository = sanctionRepository;
     }
 
     public async Task<ParametreDTO> GetByIdAsync()
     {
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var entity = await _parametreRepository.GetParam(userId);
-        return _mapper.Map<ParametreDTO>(entity);
+        return entity.Adapt<ParametreDTO>();
     }
 
-    public async Task<ParametreDTO> CreateAsync(ParametreDTO createNouveaute)
+ public async Task<ParametreDTO> CreateAsync(ParametreDTO createNouveaute)
+{
+    var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    if (string.IsNullOrEmpty(userId))
+        throw new UnauthorizedAccessException("Utilisateur non authentifié.");
+
+    // Mapper DTO vers entité Parametre
+    var parametreEntity = createNouveaute.Adapt<domain.Entity.Parametre>();
+    parametreEntity.IdBiblio = userId;
+
+    // Créer ou mettre à jour le paramètre
+    var createdParametre = await _parametreRepository.Updatepram(parametreEntity);
+
+    // Calculer les statistiques associées
+    var statistiqueEntity = await CalculerStatistiquesAsync(createdParametre);
+
+    // Enregistrer la statistique (à adapter selon votre repository/statistique)
+    await _statistiqueRepository.CreateAsync(statistiqueEntity);
+
+    // Retourner le DTO mis à jour
+    return createdParametre.Adapt<ParametreDTO>();
+}
+private async Task<Statistique> CalculerStatistiquesAsync(domain.Entity.Parametre parametre)
+{
+    // Exemple : récupérer les emprunts et sanctions liés à ce paramètre / utilisateur
+    var emprunts = await _empruntsRepository.GetAllAsync(parametre.IdBiblio);
+    var sanctions = await _sanctionRepository.GetAllAsync(parametre.IdBiblio);
+
+    // Calculs simplifiés (à adapter selon votre logique métier)
+    int nombreSanctions = sanctions.Count();
+    decimal sommeAmendes = sanctions.Sum(s => s.MontantAmende); // supposez que MontantAmende existe
+    double tauxEmpruntEnPerte = emprunts.Count(e => e.Statut_emp == Statut_emp.perdu) / (double)emprunts.Count();
+    double empruntParMembre = emprunts.Count() / (double)await _membreRepository.CountByUserIdAsync(parametre.IdBiblio);
+    double tauxEmpruntEnRetard = emprunts.Count(e => e.date_retour_prevu < DateTime.UtcNow && e.Statut_emp != Statut_emp.retourne) / (double)emprunts.Count();
+
+    return new Statistique
     {
-        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var entity = _mapper.Map<domain.Entity.Parametre>(createNouveaute);
-        entity.IdBiblio = userId;
-        var created = await _parametreRepository.Updatepram(entity);
-        return _mapper.Map<ParametreDTO>(created);
-    }
+        id_stat = Guid.NewGuid().ToString(),
+        id_param = parametre.id_param,
+        Nombre_Sanction_Emises = nombreSanctions,
+        Somme_Amende_Collectées = sommeAmendes,
+        Taux_Emprunt_En_Perte = tauxEmpruntEnPerte,
+        Emprunt_Par_Membre = empruntParMembre,
+        Taux_Emprunt_En_Retard = tauxEmpruntEnRetard,
+        Période_en_jour = 30, 
+        date_stat = DateTime.UtcNow
+    };
+}
+
 
 }

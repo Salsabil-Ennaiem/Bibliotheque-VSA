@@ -5,7 +5,6 @@ import { TagModule } from 'primeng/tag';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ProductService } from '../../../../Services/product.service';
 import { Product } from '../../../../model/product';
 import { MenuItem } from 'primeng/api';
 
@@ -14,27 +13,15 @@ import { MenuItem } from 'primeng/api';
   imports: [ButtonModule, CarouselModule, TagModule, SpeedDialModule, CommonModule, RouterLink],
   templateUrl: './liste-nouveaute.component.html',
   styleUrl: './liste-nouveaute.component.css',
-  providers: [ProductService]
+  providers: []
 })
 export class ListeNouveauteComponent implements OnInit {
   @Input() isHosted: boolean = false;
   publication: Product[] | undefined;
+  responsiveOptions: any[];
+  items: MenuItem[] | undefined;
 
-  responsiveOptions: any[] | undefined;
-
-  constructor(private productService: ProductService) {}
-
-  ngOnInit() {
-    this.productService.getProductsSmall().then((products) => {
-      this.publication = products.map(product => ({
-        ...product,
-        severity: this.getSeverity(product.date_pub)
-      }));
-      console.log('Products with severity:', this.publication.map(p => ({ status: p.date_pub, severity: p.severity })));
-    }).catch((error) => {
-      console.error('Error loading products:', error);
-    });
-
+  constructor() {
     this.responsiveOptions = [
       {
         breakpoint: '1400px',
@@ -57,6 +44,9 @@ export class ListeNouveauteComponent implements OnInit {
         numScroll: 1
       }
     ];
+  }
+
+  ngOnInit() {
   }
 
   getSeverity(status: string | undefined): string {
@@ -92,8 +82,6 @@ export class ListeNouveauteComponent implements OnInit {
       }
     ];
   }
-
-
 
   addToCart(productId: string) {
     console.log(`Add to cart product ID: ${productId}`);

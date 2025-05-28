@@ -18,9 +18,9 @@ namespace api.Features.Auth.Login
             SignInManager<Bibliothecaire> signInManager,
             IConfiguration configuration)
         {
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-            _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _userManager = userManager;
+            _signInManager = signInManager ;
+            _configuration = configuration ;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginCommand request)

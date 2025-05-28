@@ -17,11 +17,6 @@ namespace Infrastructure.Repositries
         }
 
 
-
-
-
-
-
         public async Task<Parametre> GetParam(string userId)
         {
             var parametre = await _context.Parametres

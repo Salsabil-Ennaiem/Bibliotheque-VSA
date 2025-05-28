@@ -1,43 +1,54 @@
 using System.Security.Claims;
-using AutoMapper;
-using domain.Entity;
 using domain.Interfaces;
-using Infrastructure.Repositries;
+using Mapster;
 
 namespace api.Features.Sanction;
 
 public class SanctionHandler
 {
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ISanctionRepository _sanctionRepository;
 
 
-    public SanctionHandler(IMapper mapper, IHttpContextAccessor httpContextAccessor, ISanctionRepository sanctionRepository)
+    public SanctionHandler(IHttpContextAccessor httpContextAccessor, ISanctionRepository sanctionRepository)
     {
-        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
         _sanctionRepository = sanctionRepository;
     }
 
+    private string GetUserId()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if(userId == null)
+        {
+            throw new Exception("User not authenticated");
+        }
+        return userId;
+    }
+
     public async Task<IEnumerable<SanctionDTO>> GetAllAsync()
     {
+        var userId = GetUserId();
         var entities = await _sanctionRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<SanctionDTO>>(entities);
+        var filtre = entities.Where(e => e.id_biblio == userId);
+        return filtre.Adapt<IEnumerable<SanctionDTO>>();
     }
 
     public async Task<SanctionDTO> CreateAsync(CreateSanctionRequest createSanction)
     {
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var entity = _mapper.Map<domain.Entity.Sanction>(createSanction);
+        var entity = createSanction.Adapt<domain.Entity.Sanction>();
         entity.id_biblio = userId;
         var created = await _sanctionRepository.CreateAsync(entity);
-        return _mapper.Map<SanctionDTO>(created);
+        return created.Adapt<SanctionDTO>();
     }
 
     public async Task<IEnumerable<domain.Entity.Sanction>> SearchAsync(string searchTerm)
     {
-        return await _sanctionRepository.SearchAsync(searchTerm);
+        var id = GetUserId();
+        var entities = await _sanctionRepository.SearchAsync(searchTerm);
+        var filtre = entities.Where(e => e.id_biblio == id);
+        return filtre;
     }
     
 }

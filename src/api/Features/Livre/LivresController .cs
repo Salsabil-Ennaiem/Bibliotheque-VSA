@@ -24,6 +24,14 @@ public class LivresController : ControllerBase
     }
 
     [HttpGet("Getall")]
+    public async Task<IActionResult> GetAlllivre()
+    {
+        var livres = await _livresHandler.GetAllLivresAsync();
+        return Ok(livres);
+    }
+
+
+    [HttpGet("GetallUser")]
     public async Task<IActionResult> GetAll()
     {
         var livres = await _livresHandler.GetAllAsync();

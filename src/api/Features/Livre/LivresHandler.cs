@@ -19,6 +19,12 @@ public class LivresHandler
         _httpContextAccessor = httpContextAccessor;
     }
 
+    public async Task<IEnumerable<LivreDTO>> GetAllLivresAsync()
+    {
+        var entity = await _livresRepository.GetAllAsync();
+        return entity.Select(e => e.Item1.Adapt<LivreDTO>());
+
+    }
     public async Task<IEnumerable<LivreDTO>> SearchAsync(string searchTerm)
     {
 
@@ -100,9 +106,9 @@ public class LivresHandler
             }
 
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            throw new Exception("Erreur lors de l'importation des données depuis le fichier Excel",ex );
+            throw new Exception("Erreur lors de l'importation des données depuis le fichier Excel", ex);
         }
         finally
         {
@@ -152,7 +158,7 @@ public class LivresHandler
         workbook.Write(stream);
         stream.Position = 0;
 
-        workbook.Close(); 
+        workbook.Close();
 
         return stream;
     }

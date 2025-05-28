@@ -1,7 +1,6 @@
 using System.Text;
 using api.Features.Auth.Login;
 using api.Features.ScrapingLivres;
-using api.Features.Auth;
 using Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +17,9 @@ using api.Features.Emprunt;
 using api.Features.Parametre;
 using api.Features.Sanction;
 using Npgsql;
+using api.Features.Auth.ForgetPassword;
+using api.Features.Profile;
+using Infrastructure.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,9 +48,9 @@ builder.Services.AddDbContext<BiblioDbContext>(options =>
 
 builder.Services.AddIdentity<Bibliothecaire, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false; 
+    options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
-}).AddEntityFrameworkStores<BiblioDbContext>() .AddDefaultTokenProviders();
+}).AddEntityFrameworkStores<BiblioDbContext>().AddDefaultTokenProviders();
 
 
 
@@ -75,8 +77,9 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddHttpContextAccessor();
 
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("Angular", policy => 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
         policy.WithOrigins("https://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod());
@@ -107,16 +110,19 @@ builder.Services.AddScoped<IEmpruntsRepository, EmpruntsRepository>();
 builder.Services.AddScoped<IParametreRepository, ParametreRepository>();
 builder.Services.AddScoped<IScrapingRepository, ScrapingRepository>();
 builder.Services.AddScoped<ISanctionRepository, SanctionRepository>();
-builder.Services.AddScoped<INouveauteRepository , NouveauteRepository>();
- 
+builder.Services.AddScoped<INouveauteRepository, NouveauteRepository>();
+
 builder.Services.AddScoped<LivresHandler>();
 builder.Services.AddScoped<EmpruntHandler>();
 builder.Services.AddScoped<ParametreHandler>();
 builder.Services.AddScoped<SanctionHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<NouveauteHandler>();
+builder.Services.AddScoped<ForgotPasswordHandler>();
+builder.Services.AddScoped<ProfileHandler>();
 
 
+ 
 builder.Services.AddBiruniServices(builder.Configuration);
 builder.Services.AddHttpClient<BiruniHtmlExtractor>(client =>
 {
@@ -124,8 +130,10 @@ builder.Services.AddHttpClient<BiruniHtmlExtractor>(client =>
     client.DefaultRequestHeaders.UserAgent.ParseAdd("BiruniScraper/1.0");
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>{
-    c.SwaggerDoc("v1", new() { Title = "Biruni Scraper", Version = "v1" });});
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Biruni Scraper", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -136,38 +144,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 // Appel du seeding au démarrage de l'application
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var userManager = services.GetRequiredService<UserManager<Bibliothecaire>>();
+        Console.WriteLine("🚀 Starting application seeding process...");
 
-        // Récupérer les utilisateurs existants
-        var users = await userManager.Users.ToListAsync();
+        
+        await UserSeeder.SeedUsersAsync(services);
 
-        if (users.Count >= 2)
-        {
-            // Récupérer les IDs des deux premiers bibliothécaires
-            string biblio1Id = users[0].Id;
-            string biblio2Id = users[1].Id;
-
-            // Appeler le seed complet avec les IDs récupérés
-            await DataSeeder.SeedAllDataAsync(services, biblio1Id, biblio2Id);
-        }
-        else
-        {
-            Console.WriteLine("⚠️ Moins de 2 utilisateurs trouvés, veuillez d'abord seed les utilisateurs.");
-             await UserSeeder.SeedUsersAsync(services);
-            Console.WriteLine("🌱 Seed des utilisateurs terminé.");
-        }
+        Console.WriteLine("✅ Seeding process completed successfully!");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error during seeding: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
     }
 }
+
+
+
 
 app.UseCors("Angular");
 app.UseAuthentication();

@@ -1,54 +1,150 @@
 using System.Security.Claims;
-using AutoMapper;
 using domain.Entity;
 using domain.Entity.Enum;
 using domain.Interfaces;
-using Infrastructure.Repositries;
+using Mapster;
 using NPOI.XSSF.UserModel;
+using MailKit.Net.Smtp;
+using MimeKit;
+using Microsoft.AspNetCore.Identity;
 
 namespace api.Features.Emprunt;
 
 public class EmpruntHandler
 {
     private readonly IEmpruntsRepository _empruntsRepository;
-    private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IParametreRepository _parametreRepository;
+    private readonly UserManager<Bibliothecaire> _userManager;
+    private readonly IConfiguration _configuration;// inject configuration for SMTP settings
 
-
-    public EmpruntHandler(IEmpruntsRepository empruntsRepository , IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    public EmpruntHandler(UserManager<Bibliothecaire> userManager , IEmpruntsRepository empruntsRepository, IHttpContextAccessor httpContextAccessor, IParametreRepository parametreRepository, IConfiguration configuration)
     {
         _empruntsRepository = empruntsRepository;
-        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
+        _parametreRepository = parametreRepository;
+        _userManager = userManager;
+        _configuration = configuration;
     }
+
+    private string GetCurrentUserId()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        return userId;
+    }
+
+    public async Task<IEnumerable<EmppruntDTO>> GetAllAsync()
+    {
+        var userId = GetCurrentUserId();
+        var entities = await _empruntsRepository.GetAllAsync();
+        var filtered = entities.Where(e => e.id_biblio == userId);
+        return filtered.Adapt<IEnumerable<EmppruntDTO>>();
+    }
+
+    public async Task<EmppruntDTO> GetByIdAsync(string id)
+    {
+        var userId = GetCurrentUserId();
+        var entity = await _empruntsRepository.GetByIdAsync(id);
+        if (entity.id_biblio != userId)
+            throw new UnauthorizedAccessException("Access denied.");
+        return entity.Adapt<EmppruntDTO>();
+    }
+
+    public async Task NotifyOverdueEmpruntsAsync()
+    {
+        var userId = GetCurrentUserId();
+        var today = DateTime.UtcNow;
+
+        var parametre = await _parametreRepository.GetParam(userId);
+        if (parametre == null)
+            throw new Exception("Parametre not found for the user.");
+
+        var overdueEmprunts = await _empruntsRepository.GetOverdueEmpruntsAsync(userId, today);
+
+        foreach (var emprunt in overdueEmprunts)
+        {
+            var message = parametre.Modele_Email_Retard
+                ?.Replace("{IdEmprunt}", emprunt.id_emp)
+                ?.Replace("{DateRetourPrevu}", emprunt.date_retour_prevu?.ToString("d"))
+                ?? $"Your loan with ID {emprunt.id_emp} is overdue since {emprunt.date_retour_prevu?.ToShortDateString()}.";
+
+            // Send email directly
+            await SendEmailAsync(userId, "Overdue Loan Notification", message);
+        }
+    }
+
+    private async Task SendEmailAsync(string userId, string subject, string body)
+    {
+        var userEmail = await GetUserEmailByIdAsync(userId);
+        if (string.IsNullOrEmpty(userEmail))
+            throw new Exception($"Email not found for user {userId}");
+
+        var emailMessage = new MimeMessage();
+        emailMessage.From.Add(new MailboxAddress(_configuration["MailSettings:Username"], _configuration["MailSettings:From"]));
+        emailMessage.To.Add(new MailboxAddress("", userEmail));
+        emailMessage.Subject = subject;
+        emailMessage.Body = new TextPart("plain") { Text = body };
+
+        using var client = new SmtpClient();
+        await client.ConnectAsync(_configuration["MailSettings:Host"], int.Parse(_configuration["MailSettings:Port"]), true);
+        await client.AuthenticateAsync(_configuration["MailSettings:Username"], _configuration["MailSettings:Password"]);
+        await client.SendAsync(emailMessage);
+        await client.DisconnectAsync(true);
+    }
+
+   private async Task<string> GetUserEmailByIdAsync(string userId)
+{
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null)
+        throw new Exception($"User with ID {userId} not found.");
+
+    return user.Email ?? throw new Exception($"Email not set for user with ID {userId}.");
+}
 
     public async Task<IEnumerable<Emprunts>> SearchAsync(string searchTerm)
     {
-        return await _empruntsRepository.SearchAsync(searchTerm);
+        var entities = await _empruntsRepository.SearchAsync(searchTerm);
+        var id = GetCurrentUserId();
+        var filtered = entities.Where(e => e.id_biblio == id);
+       return filtered;
+       
     }
-    public async Task<IEnumerable<EmppruntDTO>> GetAllAsync()
-    {
-        var entities = await _empruntsRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<EmppruntDTO>>(entities);
-    }
-    public async Task<EmppruntDTO> GetByIdAsync(string id)
-    {
-        var entity = await _empruntsRepository.GetByIdAsync(id);
-        return _mapper.Map<EmppruntDTO>(entity);
-    }
+
     public async Task<EmppruntDTO> CreateAsync(CreateEmpRequest empdto)
     {
-         var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
-               var entity = _mapper.Map<Emprunts>(empdto);
-                entity.id_biblio = userId;
-            var created = await _empruntsRepository.CreateAsync(entity);
-            return _mapper.Map<EmppruntDTO>(created);
+        var userId = GetCurrentUserId();
+
+        // Get parameters for the current user (bibliothecaire)
+        var parametre = await _parametreRepository.GetParam(userId);
+        if (parametre == null)
+            throw new Exception("Parametre not found for the user.");
+
+        var entity = empdto.Adapt<Emprunts>();
+        entity.id_biblio = userId;
+        entity.date_emp = DateTime.UtcNow;
+
+        // Determine delay based on member type
+        int delayDays = empdto.TypeMembre switch
+        {
+            TypeMemb.Etudiant => parametre.Delais_Emprunt_Etudiant,
+            TypeMemb.Enseignant => parametre.Delais_Emprunt_Enseignant,
+            _ => parametre.Delais_Emprunt_Autre
+        };
+
+        entity.date_retour_prevu = entity.date_emp.AddDays(delayDays);
+
+        var created = await _empruntsRepository.CreateAsync(entity);
+        return created.Adapt<EmppruntDTO>();
     }
+
     public async Task<EmppruntDTO> UpdateAsync(EmppruntDTO emp, string id)
     {
-        var entity = _mapper.Map<Emprunts>(emp);
-        var created = await _empruntsRepository.UpdateAsync(entity , id);
-        return _mapper.Map<EmppruntDTO>(created);    }
+        var entity = emp.Adapt<Emprunts>();
+        var created = await _empruntsRepository.UpdateAsync(entity, id);
+        return created.Adapt<EmppruntDTO>();
+    }
     public async Task DeleteAsync(string id)
     {
         await _empruntsRepository.DeleteAsync(id);
@@ -89,7 +185,7 @@ public class EmpruntHandler
 
         var headerRow = sheet.CreateRow(0);
         string[] headers = {
-            "IdEmprunt", "IdMembre", "IdBibliothecaire", "IdInventaire", "DateEmprunt", 
+            "IdEmprunt", "IdMembre", "IdBibliothecaire", "IdInventaire", "DateEmprunt",
             "DateRetourPrevu", "DateEffectif", "StatutEmprunt", "Note"
         };
 
@@ -115,4 +211,6 @@ public class EmpruntHandler
         workbook.Write(stream);
         stream.Position = 0;
         return stream;
-    }}
+    }
+}
+

@@ -14,6 +14,12 @@ namespace api.Features.Nouveautes
             _nouveauteHandler = nouveauteHandler;
         }
         [HttpGet("Getall")]
+        public async Task<IActionResult> GetAllNouv()
+        {
+            var nouveautes = await _nouveauteHandler.GetAllNouvAsync();
+            return Ok(nouveautes);
+        }
+        [HttpGet("GetallUser")]
         public async Task<IActionResult> GetAll()
         {
             var nouveautes = await _nouveauteHandler.GetAllAsync();

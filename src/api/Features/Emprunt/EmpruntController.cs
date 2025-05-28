@@ -14,6 +14,13 @@ public class EmpruntController : ControllerBase
         _empruntHundler = empruntHundler;
     }
 
+    [HttpGet("Notification")]
+    public async Task<IActionResult> GetNotifications()
+    {
+       await _empruntHundler.NotifyOverdueEmpruntsAsync();
+        return Ok("Notifications sent successfully.");
+    }
+
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string term)
     {
