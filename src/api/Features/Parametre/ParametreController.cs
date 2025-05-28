@@ -16,7 +16,7 @@ public class ParametreController : ControllerBase
         {
             var Parametre = await _parametreHandler.GetByIdAsync();
             return Ok(Parametre);
-        }
+        } 
         [HttpPost("Update")]
         public async Task<IActionResult> Update([FromBody] ParametreDTO Parametre)
         {

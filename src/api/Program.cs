@@ -17,6 +17,8 @@ using api.Features.Nouveautes;
 using api.Features.Emprunt;
 using api.Features.Parametre;
 using api.Features.Sanction;
+using Npgsql;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +28,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("postgres"));
+dataSourceBuilder.EnableDynamicJson();
+var dataSource = dataSourceBuilder.Build();
+
+builder.Services.AddDbContext<BiblioDbContext>(options =>
+{
+    options.UseNpgsql(dataSource);
+});
+
+/*
 builder.Services.AddDbContext<BiblioDbContext>(options => 
         options.UseNpgsql(builder.Configuration.GetConnectionString("postgres")).EnableSensitiveDataLogging());
-
+*/
 
 
 builder.Services.AddIdentity<Bibliothecaire, IdentityRole>(options =>
@@ -80,17 +93,25 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IRepository<Nouveaute>, Repository<Nouveaute>>();
+builder.Services.AddScoped<IRepository<Emprunts>, Repository<Emprunts>>();
+builder.Services.AddScoped<IRepository<Parametre>, Repository<Parametre>>();
+builder.Services.AddScoped<IRepository<Sanction>, Repository<Sanction>>();
+builder.Services.AddScoped<IRepository<Livres>, Repository<Livres>>();
+
+builder.Services.AddScoped<Repository<Parametre>>();
+builder.Services.AddScoped<Repository<Sanction>>();
+
 builder.Services.AddScoped<ILivresRepository, LivresRepository>();
 builder.Services.AddScoped<IEmpruntsRepository, EmpruntsRepository>();
-// builder.Services.AddScoped<IParametreRepository, ParametreRepository>();
-builder.Services.AddScoped<ISanctionRepository, SanctionRepository>();
+builder.Services.AddScoped<IParametreRepository, ParametreRepository>();
 builder.Services.AddScoped<IScrapingRepository, ScrapingRepository>();
+builder.Services.AddScoped<ISanctionRepository, SanctionRepository>();
 builder.Services.AddScoped<INouveauteRepository , NouveauteRepository>();
-
+ 
 builder.Services.AddScoped<LivresHandler>();
 builder.Services.AddScoped<EmpruntHandler>();
-//builder.Services.AddScoped<ParametreHandler>();
+builder.Services.AddScoped<ParametreHandler>();
 builder.Services.AddScoped<SanctionHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<NouveauteHandler>();

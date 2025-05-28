@@ -19,7 +19,7 @@ namespace Infrastructure.Repositries
                            || (e.Id_inv != null && e.Id_inv.Contains(searchTerm))
                            || e.Statut_emp.ToString().Contains(searchTerm)
                            || (e.note != null && e.note.Contains(searchTerm))
-                           || e.Membre.ToString().Contains(searchTerm)
+                           || (e.id_membre != null && e.id_membre.Contains(searchTerm))
                         select new { Emprunts = e};
             
 

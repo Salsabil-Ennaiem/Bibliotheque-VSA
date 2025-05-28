@@ -22,7 +22,7 @@ namespace Data.Configurations;
 
             builder.HasMany(e => e.Membres)
                 .WithOne(m => m.Bibliothecaire)
-                .HasForeignKey(m => m.id_membre)
+                .HasForeignKey(m => m.id_biblio)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(e => e.Emprunts)

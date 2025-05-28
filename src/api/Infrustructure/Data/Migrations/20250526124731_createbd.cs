@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class TableConfigSeeder : Migration
+    public partial class createbd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -313,7 +313,7 @@ namespace api.Migrations
                     id_membre = table.Column<string>(type: "text", nullable: false),
                     id_biblio = table.Column<string>(type: "text", nullable: true),
                     Id_inv = table.Column<string>(type: "text", nullable: false),
-                    date_emp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2025, 5, 25, 0, 38, 22, 566, DateTimeKind.Utc).AddTicks(3674)),
+                    date_emp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2025, 5, 26, 12, 47, 30, 213, DateTimeKind.Utc).AddTicks(8473)),
                     date_retour_prevu = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     date_effectif = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Statut_emp = table.Column<string>(type: "text", nullable: false, defaultValue: "en_cours"),
@@ -329,8 +329,8 @@ namespace api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Emprunts_Inventaire_id_emp",
-                        column: x => x.id_emp,
+                        name: "FK_Emprunts_Inventaire_Id_inv",
+                        column: x => x.Id_inv,
                         principalTable: "Inventaire",
                         principalColumn: "id_inv",
                         onDelete: ReferentialAction.SetNull);
@@ -422,6 +422,11 @@ namespace api.Migrations
                 name: "IX_Emprunts_id_biblio",
                 table: "Emprunts",
                 column: "id_biblio");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Emprunts_Id_inv",
+                table: "Emprunts",
+                column: "Id_inv");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Inventaire_id_liv",

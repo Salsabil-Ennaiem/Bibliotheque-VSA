@@ -5,8 +5,10 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Seeders;
+
 public static class DataSeeder
 {
+    
     public static async Task SeedUsersAsync(IServiceProvider serviceProvider)
     {
         try
@@ -14,11 +16,11 @@ public static class DataSeeder
             var userManager = serviceProvider.GetRequiredService<UserManager<Bibliothecaire>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            var roleExists = await roleManager.RoleExistsAsync("ADMIN")&& await roleManager.RoleExistsAsync("Bibliothecaire");
+            var roleExists = await roleManager.RoleExistsAsync("ADMIN") && await roleManager.RoleExistsAsync("Bibliothecaire");
             if (!roleExists)
             {
                 await roleManager.CreateAsync(new IdentityRole("Bibliothecaire"));
-                 await roleManager.CreateAsync(new IdentityRole("ADMIN"));
+                await roleManager.CreateAsync(new IdentityRole("ADMIN"));
                 Console.WriteLine("Created 'Bibliothecaire , ADMIN' role");
             }
 
@@ -76,7 +78,7 @@ public static class DataSeeder
         try
         {
             var dbContext = serviceProvider.GetRequiredService<BiblioDbContext>();
-            
+
             var existingBooks = await dbContext.Livres.AnyAsync();
             if (existingBooks)
             {
@@ -90,10 +92,13 @@ public static class DataSeeder
                 var livres = await SeedLivresAsync(dbContext, biblio1Id, biblio2Id);
                 var inventaires = await SeedInventairesAsync(dbContext, livres);
                 var membres = await SeedMembresAsync(dbContext, biblio1Id, biblio2Id);
-                
+
                 var (ancienParametre, nouveauParametre) = await SeedParametresAsync(dbContext, biblio1Id, biblio2Id);
-                
-              var emprunts = await SeedEmpruntsAsync(dbContext, membres, inventaires, biblio1Id, biblio2Id);
+
+                // IMPORTANT: Save changes before creating emprunts to ensure all foreign keys exist
+                await dbContext.SaveChangesAsync();
+
+               var emprunts = await SeedEmpruntsAsync(dbContext, membres, inventaires, biblio1Id, biblio2Id);
                 await SeedSanctionsAsync(dbContext, emprunts, membres, biblio1Id);
                 await SeedNouveautesAsync(dbContext, biblio1Id, biblio2Id);
                 await SeedStatistiquesAsync(dbContext, ancienParametre, nouveauParametre, emprunts, membres);
@@ -287,7 +292,7 @@ public static class DataSeeder
                     { "type", "pdf" },
                     { "nom", "collection_informatique_2024.pdf" },
                     { "taille", "2.5MB" },
-                    { "url", "/files/nouveautes/collection_informatique_2024.pdf" }
+                    { "url", "https://isgs.rnu.tn/useruploads/files/3lsc%20ff.pdf.pdf" }
                 },
                 description = "Découvrez notre nouvelle collection de livres d'informatique pour 2024. Plus de 50 nouveaux titres disponibles !",
                 date_publication = DateTime.UtcNow.AddDays(-7),
@@ -303,7 +308,7 @@ public static class DataSeeder
                     { "type", "image" },
                     { "nom", "horaires_ete_2024.jpg" },
                     { "taille", "1.2MB" },
-                    { "url", "/files/nouveautes/horaires_ete_2024.jpg" }
+                    { "url", "https://isgs.rnu.tn/stylesheets/images/shapes-2_04.pngjpg" }
                 },
                 description = "Nouveaux horaires d'ouverture pour la période estivale. La bibliothèque sera ouverte de 8h à 16h du lundi au vendredi.",
                 date_publication = DateTime.UtcNow.AddDays(-3),
@@ -319,7 +324,7 @@ public static class DataSeeder
                     { "type", "document" },
                     { "nom", "formation_recherche_programme.docx" },
                     { "taille", "0.8MB" },
-                    { "url", "/files/nouveautes/formation_recherche_programme.docx" }
+                    { "url", @"C:\Users\salsa\Downloads\page-word.com-facture6.docx" }
                 },
                 description = "Inscrivez-vous à nos ateliers de formation à la recherche documentaire. Sessions tous les mardis à 14h.",
                 date_publication = DateTime.UtcNow.AddDays(-1),
@@ -331,7 +336,6 @@ public static class DataSeeder
         await dbContext.SaveChangesAsync();
         Console.WriteLine($"✅ Seeded {nouveautes.Count} nouveautes");
     }
-
 
     private static async Task<(Parametre ancien, Parametre nouveau)> SeedParametresAsync(BiblioDbContext dbContext, string biblio1Id, string biblio2Id)
     {
@@ -363,81 +367,104 @@ public static class DataSeeder
         return (ancienParametre, nouveauParametre);
     }
 
-    private static async Task<List<Emprunts>> SeedEmpruntsAsync(BiblioDbContext dbContext, List<Membre> membres, List<Inventaire> inventaires, string biblio1Id, string biblio2Id)
+private static async Task<List<Emprunts>> SeedEmpruntsAsync(BiblioDbContext dbContext, List<Membre> membres, List<Inventaire> inventaires, string biblio1Id, string biblio2Id)
+{
+    // Verify that all referenced entities exist in the database
+    var existingMembres = await dbContext.Membres.Select(m => m.id_membre).ToListAsync();
+    var existingInventaires = await dbContext.Inventaires.Select(i => i.id_inv).ToListAsync();
+    var existingBiblios = await dbContext.Users.Select(u => u.Id).ToListAsync();
+
+    Console.WriteLine($"🔍 Debug - Membres in DB: {existingMembres.Count}");
+    Console.WriteLine($"🔍 Debug - Inventaires in DB: {existingInventaires.Count}");
+    Console.WriteLine($"🔍 Debug - Biblios in DB: {existingBiblios.Count}");
+
+    // Print actual IDs for debugging
+    Console.WriteLine($"🔍 Debug - Membre IDs: {string.Join(", ", existingMembres)}");
+    Console.WriteLine($"🔍 Debug - Inventaire IDs: {string.Join(", ", existingInventaires)}");
+    Console.WriteLine($"🔍 Debug - Biblio IDs: {string.Join(", ", existingBiblios)}");
+
+    var emprunts = new List<Emprunts>
     {
-        Console.WriteLine("🔍 Debug - Inventaires disponibles:");
-        foreach (var inv in inventaires)
+        // Emprunt normal - Ahmed
+        new Emprunts
         {
-            Console.WriteLine($"  📦 Inventaire ID: {inv.id_inv} - Livre ID: {inv.id_liv}");
+            id_emp = Guid.NewGuid().ToString(),
+            id_membre = membres[0].id_membre,
+            id_biblio = biblio1Id,
+            Id_inv = inventaires[1].id_inv, // Make sure this matches exactly
+            date_emp = DateTime.UtcNow.AddDays(-25),
+            date_retour_prevu = DateTime.UtcNow.AddDays(-18),
+            date_effectif = DateTime.UtcNow.AddDays(-20),
+            Statut_emp = Statut_emp.retourne,
+            note = "Emprunt retourné à temps"
+        },
+        // Emprunt en retard - Fatma (EN_COURS mais date dépassée)
+        new Emprunts
+        {
+            id_emp = Guid.NewGuid().ToString(),
+            id_membre = membres[1].id_membre,
+            id_biblio = biblio2Id,
+            Id_inv = inventaires[2].id_inv,
+            date_emp = DateTime.UtcNow.AddDays(-35),
+            date_retour_prevu = DateTime.UtcNow.AddDays(-25),
+            date_effectif = null,
+            Statut_emp = Statut_emp.en_cours,
+            note = "Emprunt en retard - sanction appliquée"
+        },
+        // Emprunt perdu - Mohamed (plus de 1 an)
+        new Emprunts
+        {
+            id_emp = Guid.NewGuid().ToString(),
+            id_membre = membres[2].id_membre,
+            id_biblio = biblio1Id,
+            Id_inv = inventaires[3].id_inv,
+            date_emp = DateTime.UtcNow.AddDays(-400),
+            date_retour_prevu = DateTime.UtcNow.AddDays(-385),
+            date_effectif = null,
+            Statut_emp = Statut_emp.perdu,
+            note = "Livre perdu - emprunt dépassé 1 an"
+        },
+        // Deuxième emprunt Ahmed (pour avoir au moins 1 emprunt par membre)
+        new Emprunts
+        {
+            id_emp = Guid.NewGuid().ToString(),
+            id_membre = membres[0].id_membre,
+            id_biblio = biblio1Id,
+            Id_inv = inventaires[0].id_inv,
+            date_emp = DateTime.UtcNow.AddDays(-15),
+            date_retour_prevu = DateTime.UtcNow.AddDays(-1),
+            date_effectif = null,
+            Statut_emp = Statut_emp.en_cours,
+            note = "Deuxième emprunt Ahmed - en retard"
         }
+    };
 
-        var emprunts = new List<Emprunts>
+    Console.WriteLine("🔍 Debug - Emprunts à créer:");
+    // Validate foreign keys before inserting
+    foreach (var emp in emprunts)
+    {
+        Console.WriteLine($"  📋 Emprunt: Membre={emp.id_membre}, Inventaire={emp.Id_inv}, Biblio={emp.id_biblio}");
+        
+        if (!existingMembres.Contains(emp.id_membre))
         {
-            // Emprunt normal - Ahmed
-            new Emprunts
-            {
-                id_emp = Guid.NewGuid().ToString(),
-                id_membre = membres[0].id_membre, // Ahmed - étudiant
-                id_biblio = biblio1Id,
-                Id_inv = inventaires[1].id_inv, // Base de Données
-                date_emp = DateTime.UtcNow.AddDays(-25), // Il y a 25 jours
-                date_retour_prevu = DateTime.UtcNow.AddDays(-18), // Était prévu il y a 18 jours
-                date_effectif = DateTime.UtcNow.AddDays(-20), // Retourné il y a 20 jours (à temps)
-                Statut_emp = Statut_emp.retourne,
-                note = "Emprunt retourné à temps"
-            },
-            // Emprunt en retard - Fatma (EN_COURS mais date dépassée)
-            new Emprunts
-            {
-                id_emp = Guid.NewGuid().ToString(),
-                id_membre = membres[1].id_membre, // Fatma - enseignant
-                id_biblio = biblio2Id,
-                Id_inv = inventaires[2].id_inv, // Architecture Web
-                date_emp = DateTime.UtcNow.AddDays(-35), // Il y a 35 jours
-                date_retour_prevu = DateTime.UtcNow.AddDays(-25), // Était prévu il y a 25 jours
-                date_effectif = null, // Pas encore retourné
-                Statut_emp = Statut_emp.en_cours, // EN_COURS mais en retard
-                note = "Emprunt en retard - sanction appliquée"
-            },
-            // Emprunt perdu - Mohamed (plus de 1 an)
-            new Emprunts
-            {
-                id_emp = Guid.NewGuid().ToString(),
-                id_membre = membres[2].id_membre, // Mohamed
-                id_biblio = biblio1Id,
-                Id_inv = inventaires[3].id_inv, // JavaScript Avancé (statut perdu)
-                date_emp = DateTime.UtcNow.AddDays(-400), // Il y a plus d'1 an
-                date_retour_prevu = DateTime.UtcNow.AddDays(-385), // Était prévu il y a 385 jours
-                date_effectif = null, // Jamais retourné
-                Statut_emp = Statut_emp.perdu, // PERDU après 1 an
-                note = "Livre perdu - emprunt dépassé 1 an"
-            },
-            // Deuxième emprunt Ahmed (pour avoir au moins 1 emprunt par membre)
-            new Emprunts
-            {
-                id_emp = Guid.NewGuid().ToString(),
-                id_membre = membres[0].id_membre, // Ahmed - deuxième emprunt
-                id_biblio = biblio1Id,
-                Id_inv = inventaires[0].id_inv, // Programmation C#
-                date_emp = DateTime.UtcNow.AddDays(-15), // Il y a 15 jours
-                date_retour_prevu = DateTime.UtcNow.AddDays(-1), // Était prévu hier
-                date_effectif = null, // Pas encore retourné
-                Statut_emp = Statut_emp.en_cours, // EN_COURS mais en retard
-                note = "Deuxième emprunt Ahmed - en retard"
-            }
-        };
-
-        Console.WriteLine("🔍 Debug - Emprunts à créer:");
-        foreach (var emp in emprunts)
-        {
-            Console.WriteLine($"  📋 Emprunt: Membre={emp.id_membre}, Inventaire={emp.Id_inv}");
+            throw new InvalidOperationException($"Membre {emp.id_membre} not found in database. Available: {string.Join(", ", existingMembres)}");
         }
-
-        await dbContext.Emprunts.AddRangeAsync(emprunts);
-        await dbContext.SaveChangesAsync();
-        Console.WriteLine($"✅ Seeded {emprunts.Count} emprunts");
-        return emprunts;
+        if (!existingInventaires.Contains(emp.Id_inv))
+        {
+            throw new InvalidOperationException($"Inventaire {emp.Id_inv} not found in database. Available: {string.Join(", ", existingInventaires)}");
+        }
+        if (!existingBiblios.Contains(emp.id_biblio))
+        {
+            throw new InvalidOperationException($"Bibliothecaire {emp.id_biblio} not found in database. Available: {string.Join(", ", existingBiblios)}");
+        }
     }
+
+    await dbContext.Emprunts.AddRangeAsync(emprunts);
+    await dbContext.SaveChangesAsync();
+    Console.WriteLine($"✅ Seeded {emprunts.Count} emprunts");
+    return emprunts;
+}
+
 
     private static async Task SeedSanctionsAsync(BiblioDbContext dbContext, List<Emprunts> emprunts, List<Membre> membres, string biblio1Id)
     {
@@ -447,14 +474,14 @@ public static class DataSeeder
             new Sanction
             {
                 id_sanc = Guid.NewGuid().ToString(),
-                id_membre = membres[1].id_membre, 
+                id_membre = membres[1].id_membre,
                 id_biblio = biblio1Id,
-                id_emp = emprunts[1].id_emp, 
+                id_emp = emprunts[1].id_emp,
                 raison = Raison_sanction.retard,
                 date_sanction = DateTime.UtcNow.AddDays(-20),
                 date_fin_sanction = DateTime.UtcNow.AddDays(10), // Sanction de 30 jours
-                montant = 15.00m, 
-                payement = false, 
+                montant = 15.00m,
+                payement = false,
                 active = true,
                 description = "Retard de 10 jours pour le livre Architecture Web"
             },
@@ -462,14 +489,14 @@ public static class DataSeeder
             new Sanction
             {
                 id_sanc = Guid.NewGuid().ToString(),
-                id_membre = membres[2].id_membre, 
+                id_membre = membres[2].id_membre,
                 id_biblio = biblio1Id,
-                id_emp = emprunts[2].id_emp, 
+                id_emp = emprunts[2].id_emp,
                 raison = Raison_sanction.perte,
                 date_sanction = DateTime.UtcNow.AddDays(-100),
                 date_fin_sanction = null, // Pas de fin tant que pas retourne le livre ou payer 
                 montant = 45.00m, // Amende de 45dt pour livre perdu
-                payement = false, 
+                payement = false,
                 active = true,
                 description = "Livre JavaScript Avancé perdu depuis plus d'1 an"
             },
@@ -479,13 +506,13 @@ public static class DataSeeder
                 id_sanc = Guid.NewGuid().ToString(),
                 id_membre = membres[0].id_membre, // Ahmed
                 id_biblio = biblio1Id,
-                id_emp = emprunts[3].id_emp, 
+                id_emp = emprunts[3].id_emp,
                 raison = Raison_sanction.retard,
                 date_sanction = DateTime.UtcNow.AddDays(-2),
                 date_fin_sanction = DateTime.UtcNow.AddDays(5), // Sanction de 7 jours
-                montant = 8.00m, 
-                payement = true, 
-                active = true, 
+                montant = 8.00m,
+                payement = true,
+                active = true,
                 description = "Retard de 1 jour pour le livre Programmation C# - payé"
             }
         };
@@ -495,40 +522,40 @@ public static class DataSeeder
         Console.WriteLine($"✅ Seeded {sanctions.Count} sanctions");
     }
 
-     private static async Task SeedStatistiquesAsync(BiblioDbContext dbContext, Parametre ancienParametre, Parametre nouveauParametre, List<Emprunts> emprunts, List<Membre> membres)
+    private static async Task SeedStatistiquesAsync(BiblioDbContext dbContext, Parametre ancienParametre, Parametre nouveauParametre, List<Emprunts> emprunts, List<Membre> membres)
     {
         // Calculer les statistiques réelles basées sur les emprunts
-        
+
         // Période 1: Entre ancien paramètre et nouveau paramètre (30 jours à 10 jours)
         var dateDebutPeriode1 = ancienParametre.date_modification;
         var dateFinPeriode1 = nouveauParametre.date_modification;
         var joursP1 = (dateFinPeriode1 - dateDebutPeriode1).Days; // 20 jours
-        
+
         // Emprunts dans cette période
         var empruntsP1 = emprunts.Where(e => e.date_emp >= dateDebutPeriode1 && e.date_emp <= dateFinPeriode1).ToList();
-        
+
         // RETARD = EN_COURS + date_retour_prevu dépassée
-        var empruntsEnRetardP1 = empruntsP1.Where(e => 
-            e.Statut_emp == Statut_emp.en_cours && 
-            e.date_retour_prevu.HasValue && 
+        var empruntsEnRetardP1 = empruntsP1.Where(e =>
+            e.Statut_emp == Statut_emp.en_cours &&
+            e.date_retour_prevu.HasValue &&
             e.date_retour_prevu < DateTime.UtcNow).Count();
-            
+
         // PERTE = PERDU ou EN_COURS depuis plus de 1 an
-        var empruntsPerteP1 = emprunts.Where(e => 
-            e.Statut_emp == Statut_emp.perdu || 
+        var empruntsPerteP1 = emprunts.Where(e =>
+            e.Statut_emp == Statut_emp.perdu ||
             (e.Statut_emp == Statut_emp.en_cours && (DateTime.UtcNow - e.date_emp).Days > 365)).Count();
-        
+
         // Période 2: Depuis nouveau paramètre jusqu'à maintenant (10 jours à aujourd'hui)
         var dateDebutPeriode2 = nouveauParametre.date_modification;
         var dateFinPeriode2 = DateTime.UtcNow;
         var joursP2 = (dateFinPeriode2 - dateDebutPeriode2).Days; // 10 jours
-        
+
         var empruntsP2 = emprunts.Where(e => e.date_emp >= dateDebutPeriode2).ToList();
-        
+
         // RETARD = EN_COURS + date_retour_prevu dépassée
-        var empruntsEnRetardP2 = empruntsP2.Where(e => 
-            e.Statut_emp == Statut_emp.en_cours && 
-            e.date_retour_prevu.HasValue && 
+        var empruntsEnRetardP2 = empruntsP2.Where(e =>
+            e.Statut_emp == Statut_emp.en_cours &&
+            e.date_retour_prevu.HasValue &&
             e.date_retour_prevu < DateTime.UtcNow).Count();
 
         var statistiques = new List<Statistique>
@@ -567,6 +594,5 @@ public static class DataSeeder
         Console.WriteLine($"✅ Seeded {statistiques.Count} statistiques calculées");
         Console.WriteLine($"  📊 Période 1: {joursP1} jours - {empruntsP1.Count} emprunts - {empruntsEnRetardP1} en retard");
         Console.WriteLine($"  📊 Période 2: {joursP2} jours - {empruntsP2.Count} emprunts - {empruntsEnRetardP2} en retard");
-    }
-
+    } 
 }

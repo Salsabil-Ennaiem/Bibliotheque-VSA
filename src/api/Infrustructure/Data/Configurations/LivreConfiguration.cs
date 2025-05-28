@@ -51,7 +51,7 @@ public class LivreConfiguration : IEntityTypeConfiguration<Livres>
 
         entity.HasMany(e => e.Inventaires)
             .WithOne(i => i.Livre)
-            .HasForeignKey(i => i.id_inv)
+            .HasForeignKey(i => i.id_liv)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

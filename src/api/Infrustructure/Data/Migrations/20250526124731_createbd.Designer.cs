@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api.Migrations
 {
     [DbContext(typeof(BiblioDbContext))]
-    [Migration("20250525003823_TableConfigSeeder")]
-    partial class TableConfigSeeder
+    [Migration("20250526124731_createbd")]
+    partial class createbd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,7 +255,7 @@ namespace api.Migrations
                     b.Property<DateTime>("date_emp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2025, 5, 25, 0, 38, 22, 566, DateTimeKind.Utc).AddTicks(3674));
+                        .HasDefaultValue(new DateTime(2025, 5, 26, 12, 47, 30, 213, DateTimeKind.Utc).AddTicks(8473));
 
                     b.Property<DateTime?>("date_retour_prevu")
                         .HasColumnType("timestamp with time zone");
@@ -271,6 +271,8 @@ namespace api.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("id_emp");
+
+                    b.HasIndex("Id_inv");
 
                     b.HasIndex("id_biblio");
 
@@ -647,16 +649,16 @@ namespace api.Migrations
 
             modelBuilder.Entity("domain.Entity.Emprunts", b =>
                 {
+                    b.HasOne("domain.Entity.Inventaire", "Inventaire")
+                        .WithMany("Emprunts")
+                        .HasForeignKey("Id_inv")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.HasOne("domain.Entity.Bibliothecaire", "Bibliothecaire")
                         .WithMany("Emprunts")
                         .HasForeignKey("id_biblio")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("domain.Entity.Inventaire", "Inventaire")
-                        .WithMany("Emprunts")
-                        .HasForeignKey("id_emp")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
 
                     b.HasOne("domain.Entity.Membre", "Membre")
                         .WithMany("Emprunts")

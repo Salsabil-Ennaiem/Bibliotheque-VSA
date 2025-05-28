@@ -62,7 +62,7 @@ namespace Data.Configurations;
 
                 entity.HasMany(e => e.Emprunts)
                     .WithOne(e => e.Membre)
-                    .HasForeignKey(e => e.id_emp)
+                    .HasForeignKey(e => e.id_membre)
                     .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasMany(e => e.Sanctions)

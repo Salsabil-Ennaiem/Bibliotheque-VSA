@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RippleModule } from 'primeng/ripple';
-import { ThemeService } from '../Services/theme.service';
+import { ThemeService } from '../../Services/theme.service';
 
 @Component({
   selector: 'app-theme',
@@ -10,6 +10,6 @@ import { ThemeService } from '../Services/theme.service';
   styleUrl: './theme.component.css'
 })
 export class ThemeComponent {
-  constructor(public themeService: ThemeService) {}
+  constructor(public themeServices: ThemeService) {}
 
 }

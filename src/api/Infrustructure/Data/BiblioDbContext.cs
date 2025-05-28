@@ -30,7 +30,7 @@ public class BiblioDbContext : IdentityDbContext<Bibliothecaire>
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // Call the base method to ensure Identity are created correctly
+            base.OnModelCreating(modelBuilder); 
 
             modelBuilder.ApplyConfiguration(new EmpruntConfiguration());
             modelBuilder.ApplyConfiguration(new LivreConfiguration());

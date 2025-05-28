@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace api.Migrations
 {
     [DbContext(typeof(BiblioDbContext))]
-    [Migration("20250525004808_AjouterRoleAdmin")]
-    partial class AjouterRoleAdmin
+    [Migration("20250526130337_forgeinKeyCorrect")]
+    partial class forgeinKeyCorrect
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,7 +255,7 @@ namespace api.Migrations
                     b.Property<DateTime>("date_emp")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2025, 5, 25, 0, 48, 6, 693, DateTimeKind.Utc).AddTicks(7050));
+                        .HasDefaultValue(new DateTime(2025, 5, 26, 13, 3, 35, 822, DateTimeKind.Utc).AddTicks(5940));
 
                     b.Property<DateTime?>("date_retour_prevu")
                         .HasColumnType("timestamp with time zone");
@@ -272,7 +272,11 @@ namespace api.Migrations
 
                     b.HasKey("id_emp");
 
+                    b.HasIndex("Id_inv");
+
                     b.HasIndex("id_biblio");
+
+                    b.HasIndex("id_membre");
 
                     b.ToTable("Emprunts", (string)null);
                 });
@@ -647,20 +651,20 @@ namespace api.Migrations
 
             modelBuilder.Entity("domain.Entity.Emprunts", b =>
                 {
+                    b.HasOne("domain.Entity.Inventaire", "Inventaire")
+                        .WithMany("Emprunts")
+                        .HasForeignKey("Id_inv")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.HasOne("domain.Entity.Bibliothecaire", "Bibliothecaire")
                         .WithMany("Emprunts")
                         .HasForeignKey("id_biblio")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("domain.Entity.Inventaire", "Inventaire")
-                        .WithMany("Emprunts")
-                        .HasForeignKey("id_emp")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
                     b.HasOne("domain.Entity.Membre", "Membre")
                         .WithMany("Emprunts")
-                        .HasForeignKey("id_emp")
+                        .HasForeignKey("id_membre")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
