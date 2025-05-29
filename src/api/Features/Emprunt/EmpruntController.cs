@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.Emprunt;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EmpruntController : ControllerBase
 {
         private readonly EmpruntHandler _empruntHundler;
@@ -21,7 +23,7 @@ public class EmpruntController : ControllerBase
         return Ok("Notifications sent successfully.");
     }
 
-    [HttpGet("search")]
+    [HttpGet("search{term}")]
     public async Task<IActionResult> Search([FromQuery] string term)
     {
         var results = await _empruntHundler.SearchAsync(term);
@@ -50,7 +52,7 @@ public class EmpruntController : ControllerBase
     }
 
     [HttpPut("Update{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] EmppruntDTO emp)
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateEmppruntDTO emp)
     {
         var updated = await _empruntHundler.UpdateAsync(emp, id);
         return Ok(updated);

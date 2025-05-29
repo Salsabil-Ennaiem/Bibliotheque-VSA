@@ -29,28 +29,22 @@ public class ParametreHandler
         return entity.Adapt<ParametreDTO>();
     }
 
- public async Task<ParametreDTO> CreateAsync(ParametreDTO createNouveaute)
-{
-    var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    if (string.IsNullOrEmpty(userId))
-        throw new UnauthorizedAccessException("Utilisateur non authentifié.");
+    public async Task<ParametreDTO> CreateAsync(ParametreDTO createNouveaute)
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Utilisateur non authentifié.");
 
-    // Mapper DTO vers entité Parametre
-    var parametreEntity = createNouveaute.Adapt<domain.Entity.Parametre>();
-    parametreEntity.IdBiblio = userId;
+        var parametreEntity = createNouveaute.Adapt<domain.Entity.Parametre>();
+        parametreEntity.IdBiblio = userId;
+        var createdParametre = await _parametreRepository.Updatepram(parametreEntity);
 
-    // Créer ou mettre à jour le paramètre
-    var createdParametre = await _parametreRepository.Updatepram(parametreEntity);
+        //var statistiqueEntity = await CalculerStatistiquesAsync(createdParametre);
+        //await _statistiqueRepository.CreateAsync(statistiqueEntity);
 
-    // Calculer les statistiques associées
-    var statistiqueEntity = await CalculerStatistiquesAsync(createdParametre);
-
-    // Enregistrer la statistique (à adapter selon votre repository/statistique)
-    await _statistiqueRepository.CreateAsync(statistiqueEntity);
-
-    // Retourner le DTO mis à jour
-    return createdParametre.Adapt<ParametreDTO>();
-}
+        return createdParametre.Adapt<ParametreDTO>();
+    }
+/*
 private async Task<Statistique> CalculerStatistiquesAsync(domain.Entity.Parametre parametre)
 {
     // Exemple : récupérer les emprunts et sanctions liés à ce paramètre / utilisateur
@@ -78,5 +72,5 @@ private async Task<Statistique> CalculerStatistiquesAsync(domain.Entity.Parametr
     };
 }
 
-
+*/
 }

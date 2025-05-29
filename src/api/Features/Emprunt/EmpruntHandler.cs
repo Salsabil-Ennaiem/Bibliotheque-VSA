@@ -13,12 +13,13 @@ namespace api.Features.Emprunt;
 public class EmpruntHandler
 {
     private readonly IEmpruntsRepository _empruntsRepository;
+    private readonly IRepository<Membre> _membreRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IParametreRepository _parametreRepository;
     private readonly UserManager<Bibliothecaire> _userManager;
-    private readonly IConfiguration _configuration;// inject configuration for SMTP settings
+    private readonly IConfiguration _configuration;
 
-    public EmpruntHandler(UserManager<Bibliothecaire> userManager , IEmpruntsRepository empruntsRepository, IHttpContextAccessor httpContextAccessor, IParametreRepository parametreRepository, IConfiguration configuration)
+    public EmpruntHandler(UserManager<Bibliothecaire> userManager, IEmpruntsRepository empruntsRepository, IHttpContextAccessor httpContextAccessor, IParametreRepository parametreRepository, IConfiguration configuration)
     {
         _empruntsRepository = empruntsRepository;
         _httpContextAccessor = httpContextAccessor;
@@ -52,7 +53,7 @@ public class EmpruntHandler
         return entity.Adapt<EmppruntDTO>();
     }
 
-    public async Task NotifyOverdueEmpruntsAsync()
+    public async Task<IEnumerable<EmppruntDTO>> NotifyOverdueEmpruntsAsync()
     {
         var userId = GetCurrentUserId();
         var today = DateTime.UtcNow;
@@ -73,6 +74,7 @@ public class EmpruntHandler
             // Send email directly
             await SendEmailAsync(userId, "Overdue Loan Notification", message);
         }
+        return overdueEmprunts.Adapt<IEnumerable<EmppruntDTO>>();
     }
 
     private async Task SendEmailAsync(string userId, string subject, string body)
@@ -94,38 +96,56 @@ public class EmpruntHandler
         await client.DisconnectAsync(true);
     }
 
-   private async Task<string> GetUserEmailByIdAsync(string userId)
-{
-    var user = await _userManager.FindByIdAsync(userId);
-    if (user == null)
-        throw new Exception($"User with ID {userId} not found.");
+    private async Task<string> GetUserEmailByIdAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            throw new Exception($"User with ID {userId} not found.");
 
-    return user.Email ?? throw new Exception($"Email not set for user with ID {userId}.");
-}
+        return user.Email ?? throw new Exception($"Email not set for user with ID {userId}.");
+    }
 
     public async Task<IEnumerable<Emprunts>> SearchAsync(string searchTerm)
     {
         var entities = await _empruntsRepository.SearchAsync(searchTerm);
         var id = GetCurrentUserId();
         var filtered = entities.Where(e => e.id_biblio == id);
-       return filtered;
-       
+        return filtered;
+
     }
 
     public async Task<EmppruntDTO> CreateAsync(CreateEmpRequest empdto)
     {
         var userId = GetCurrentUserId();
 
-        // Get parameters for the current user (bibliothecaire)
+        // 1. Recherche du membre existant via le repository générique
+        var allMembres = await _membreRepository.GetAllAsync(); 
+        var membreExistant = allMembres.FirstOrDefault(m =>
+            (!string.IsNullOrEmpty(empdto.cin_ou_passeport) && m.cin_ou_passeport == empdto.cin_ou_passeport) ||
+            (!string.IsNullOrEmpty(empdto.email) && m.email == empdto.email)
+        );
+
+        // 2. Création du membre si inexistant
+        if (membreExistant == null)
+        {
+            var nouveauMembre = empdto.Adapt<Membre>(); 
+            nouveauMembre.id_membre = Guid.NewGuid().ToString();
+            nouveauMembre.id_biblio = userId;
+
+            membreExistant = await _membreRepository.CreateAsync(nouveauMembre);
+        }
+
+        // 3. Récupération des paramètres pour le délai d'emprunt
         var parametre = await _parametreRepository.GetParam(userId);
         if (parametre == null)
             throw new Exception("Parametre not found for the user.");
 
-        var entity = empdto.Adapt<Emprunts>();
-        entity.id_biblio = userId;
-        entity.date_emp = DateTime.UtcNow;
+        // 4. Création de l'entité Emprunt
+        var empruntEntity = empdto.Adapt<Emprunts>();
+        empruntEntity.id_biblio = userId;
+        empruntEntity.id_membre = membreExistant.id_membre;
+        empruntEntity.date_emp = DateTime.UtcNow;
 
-        // Determine delay based on member type
         int delayDays = empdto.TypeMembre switch
         {
             TypeMemb.Etudiant => parametre.Delais_Emprunt_Etudiant,
@@ -133,13 +153,15 @@ public class EmpruntHandler
             _ => parametre.Delais_Emprunt_Autre
         };
 
-        entity.date_retour_prevu = entity.date_emp.AddDays(delayDays);
+        empruntEntity.date_retour_prevu = empruntEntity.date_emp.AddDays(delayDays);
 
-        var created = await _empruntsRepository.CreateAsync(entity);
-        return created.Adapt<EmppruntDTO>();
+        // 5. Enregistrement de l'emprunt
+        var createdEmprunt = await _empruntsRepository.CreateAsync(empruntEntity);
+
+        return createdEmprunt.Adapt<EmppruntDTO>();
     }
 
-    public async Task<EmppruntDTO> UpdateAsync(EmppruntDTO emp, string id)
+    public async Task<EmppruntDTO> UpdateAsync(UpdateEmppruntDTO emp, string id)
     {
         var entity = emp.Adapt<Emprunts>();
         var created = await _empruntsRepository.UpdateAsync(entity, id);

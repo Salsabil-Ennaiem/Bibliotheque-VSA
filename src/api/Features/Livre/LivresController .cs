@@ -1,5 +1,6 @@
 
 using domain.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ public class LivresController : ControllerBase
         _livresHandler = livresHandler;
     }
 
-    [HttpGet("search")]
+    [HttpGet("search{term}")]
     public async Task<IActionResult> Search([FromQuery] string term)
     {
         var results = await _livresHandler.SearchAsync(term);
@@ -30,6 +31,7 @@ public class LivresController : ControllerBase
         return Ok(livres);
     }
 
+[Authorize]
 
     [HttpGet("GetallUser")]
     public async Task<IActionResult> GetAll()
@@ -37,13 +39,15 @@ public class LivresController : ControllerBase
         var livres = await _livresHandler.GetAllAsync();
         return Ok(livres);
     }
-
+[Authorize]
     [HttpGet("Get{id}")]
     public async Task<IActionResult> GetById(string id)
     {
         var livre = await _livresHandler.GetByIdAsync(id);
         return Ok(livre);
     }
+[Authorize]
+
 
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] CreateLivreRequest livre)
@@ -51,13 +55,16 @@ public class LivresController : ControllerBase
         var createdLivre = await _livresHandler.CreateAsync(livre);
         return Ok(createdLivre);
     }
+    [Authorize]
+
 
     [HttpPut("Update{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] LivreDTO livre)
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateLivreDTO livre)
     {
         var updated = await _livresHandler.UpdateAsync(livre, id);
         return Ok(updated);
     }
+[Authorize]
 
     [HttpDelete("Delete{id}")]
     public async Task<IActionResult> Delete(string id)
@@ -65,6 +72,7 @@ public class LivresController : ControllerBase
         await _livresHandler.DeleteAsync(id);
         return NoContent();
     }
+[Authorize]
 
 
     [HttpPost("import")]
@@ -77,6 +85,8 @@ public class LivresController : ControllerBase
         await _livresHandler.ImportAsync(stream);
         return Ok("Import successful");
     }
+    [Authorize]
+
 
     [HttpGet("export")]
     public async Task<IActionResult> Export()

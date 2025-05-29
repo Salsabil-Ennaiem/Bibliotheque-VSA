@@ -1,24 +1,41 @@
-// to see datat 
-export class Bibliothecaire {
-    emailId: string;
-    password: string;
 
-    //to store 
-    constructor() {
-        this.emailId = '';
-        this.password = '';
-    }
+
+export interface LoginRequest {
+  email: string;
+  password: string;
 }
 
-export interface IBibliothecaireModel {
-    userId: number
-    emailId: string
-    password: string
-    createdDate: string
-    projectName: string
-    fullName: string
-    mobileNo: string
-    extraId: any
-  }
+export interface LoginResponse {
+  token: string;
 
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+
+export interface ProfileDTO {
+    id_biblio : string;
+    nom: string | null;
+    prenom: string | null;
+    email: string | null;
+    telephone: string | null;
+}
+
+export interface UpdateProfileDto {
+    nom: string | null;
+    prenom: string | null;
+    email: string | null;
+    telephone: string | null;
+    ancienMotDePasse: string | null;
+    nouveauMotDePasse: string | null;
+}
 

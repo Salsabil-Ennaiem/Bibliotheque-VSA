@@ -9,32 +9,17 @@ import { SpeedDialModule } from 'primeng/speeddial';
 //import { SelectModule } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
 import { RouterLink } from '@angular/router';
+import { LivreService } from '../../../../Services/livre.service';
+import { LivreDTO, livres, UpdateLivreDTO } from '../../../../model/Livres.model';
 
-interface Livre {
-  couverture: string;
-  id: string;
-  title: string;
-  author: string;
-  editeur: string;
-  date_edition: string;
-  ISBN:string;
-  cote_liv: string;
-  invtentaire: string;
-  etat_liv: string;
-  statut_liv: string;
-  isOpen: boolean;
-}
-interface SelectItem {
-  label: string;
-  value: string;
-}
+
 
 @Component({
   selector: 'app-liste-livres',
   standalone: true,
   imports: [
-   // SelectModule,
-   RouterLink,
+    // SelectModule,
+    RouterLink,
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -47,28 +32,22 @@ interface SelectItem {
   styleUrls: ['./liste-livres.component.css']
 })
 export class ListeLivresComponent {
+
   @Input() isHosted: boolean = false;
-  searchResults: Livre[] = [];
+  searchResults: LivreDTO[] = [];
   isInputVisible = false;
   searchQuery = '';
-  /*etat_liv: string[] = ['Mauvais', 'Moyen', 'Bien'];
-  statut_liv: string[] = ['Disponible', 'Emprunté', 'Perdu'];*/
-    selectedStatut: string ='';
-  selectedEtat: string ='';
-  
-  etat_liv: SelectItem[] = [
-    { label: 'Tous', value: '' },
-    { label: 'Mauvais', value: 'Mauvais' },
-    { label: 'Moyen', value: 'Moyen' },
-    { label: 'Bien', value: 'Bien' }
-  ];
-  
-  statut_liv: SelectItem[] = [
-    { label: 'Tous', value: '' },
-    { label: 'Disponible', value: 'Disponible' },
-    { label: 'Emprunté', value: 'Emprunté' },
-    { label: 'Perdu', value: 'Perdu' }
-  ];
+  livres: LivreDTO[] = [];
+
+  constructor(private livreService: LivreService) { };
+  ngOnInit(): void {
+    this.livreService.getAll().subscribe(
+      data => this.livres = data,
+      error => console.error('Error fetching livres:', error)
+    );
+  }
+
+  /*
   livres: Livre[] = [
     {
       id: '1',
@@ -229,7 +208,7 @@ editeur : 'Gallimard',
     }
   
   ];
-
+*/
   toggleInput() {
     this.isInputVisible = true;
   }
@@ -241,28 +220,32 @@ editeur : 'Gallimard',
       this.searchResults = [];
       return;
     }
-    this.searchResults = this.livres.filter(livre =>
-      livre.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-      livre.author.toLowerCase().includes(this.searchQuery.toLowerCase())
+    this.livreService.search(this.searchQuery).subscribe(
+      data => this.searchResults = data,
+      error => console.error('Error searching livres:', error)
     );
   }
+  isOpen: Set<string> = new Set(); // Track open book IDs
 
-  toggleBook(livre: Livre, event: Event) {
+  toggleBook(livre: LivreDTO, event: Event) {
     event.stopPropagation();
-    if (!livre.isOpen) {
-      this.livres.forEach(l => l.isOpen = false);
-      this.searchResults.forEach(l => l.isOpen = false);
+    const livreId = livre.id_livre;
+    if (this.isOpen.has(livreId)) {
+      this.isOpen.delete(livreId);
+    } else {
+      this.isOpen.clear(); // Close all other books
+      this.isOpen.add(livreId);
     }
-    livre.isOpen = !livre.isOpen;
   }
 
-  getSpeedDialItems(livreId: string): MenuItem[] {
+
+  getSpeedDialItems(livreId: string, livresDto: UpdateLivreDTO): MenuItem[] {
     return [
 
       {
         label: 'Modifier',
         icon: 'pi pi-pencil',
-        command: () => this.editLivre(livreId)
+        command: () => this.editLivre(livreId, livresDto)
       },
       {
         label: 'Supprimer',
@@ -272,12 +255,12 @@ editeur : 'Gallimard',
     ];
   }
 
-@ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   importer() {
     this.fileInput.nativeElement.click();
   }
 
-        handleFileUpload(event: Event) {
+  handleFileUpload(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
@@ -289,25 +272,42 @@ editeur : 'Gallimard',
       alert('Veuillez sélectionner un fichier Excel (.xls ou .xlsx).');
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.fileInput = e.target.result;
-    };
-
-
-    reader.readAsBinaryString(file);
+    this.livreService.import(file).subscribe(
+      response => console.log('Import successful:', response),
+      error => console.error('Error importing file:', error)
+    );
   }
+
   exporter() {
-    console.log('Exporter: Generate CSV and trigger download');
+    this.livreService.export().subscribe(
+      blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'LivresInventaire.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error => console.error('Error exporting file:', error)
+    );
   }
 
-  editLivre(livreId: string) {
+  editLivre(livreId: string, LivreDTO: UpdateLivreDTO) {
     console.log(`Edit livre ID: ${livreId}`);
+    this.livreService.update(livreId, LivreDTO).subscribe(
+      () => console.log('Livre updated successfully'),
+      error => console.error('Error updating livre:', error)
+    );
   }
 
   deleteLivre(livreId: string) {
     console.log(`Delete livre ID: ${livreId}`);
+    this.livreService.delete(livreId).subscribe(
+      () => console.log('Livre deleted successfully'),
+      error => console.error('Error deleting livre:', error)
+    );
   }
 
   @HostListener('document:click', ['$event'])

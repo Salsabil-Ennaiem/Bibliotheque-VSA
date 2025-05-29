@@ -13,7 +13,7 @@ public class ForgotPassewordController : ControllerBase
     {
         _forgotPasswordHandler = forgotPasswordHandler;
     }
-    [HttpPost("forgot-password")]
+    [HttpPost]
     public async Task<IActionResult> MDPOubliee([FromBody] ForgotPasswordRequestDto request)
     {
         var command = new ForgotPasswordCommand(request.Email);

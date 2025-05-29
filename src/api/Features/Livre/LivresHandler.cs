@@ -51,7 +51,7 @@ public class LivresHandler
         var createdLivre = await _livresRepository.CreateAsync(livre, inventaire);
         return createdLivre.Adapt<LivreDTO>();
     }
-    public async Task<LivreDTO> UpdateAsync(LivreDTO livre, string id)
+    public async Task<LivreDTO> UpdateAsync(UpdateLivreDTO livre, string id)
     {
         var entity = livre.Adapt<(Livres, Inventaire)>();
         var update = await _livresRepository.UpdateAsync(entity.Item1, entity.Item2, id);

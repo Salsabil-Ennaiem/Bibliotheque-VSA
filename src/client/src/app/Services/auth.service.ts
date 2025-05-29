@@ -1,33 +1,51 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
 
+import { LoginRequest, LoginResponse, ForgotPasswordRequest, ResetPasswordRequest } from '../model/bibliothecaire.model';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private baseUrl = 'http://localhost:5232/api/'; 
+  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-   private apiUrl = 'http://localhost:5232/api';
+  constructor(private http: HttpClient) {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      this.currentUserSubject.next(JSON.parse(savedUser));
+    }
+  }
 
-  constructor(private http: HttpClient) {}
-
-  login(email: string, password: string) {
-    return this.http.post<{ token: string }>(
-      `${this.apiUrl}/auth/login`, 
-      { email, password }
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/Login`, request).pipe(
+      tap(user => {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+      })
     );
   }
 
-  forgotPassword(email: string) {
-    return this.http.post<{ token: string; email: string }>(
-      `${this.apiUrl}/auth/forgot-password`,
-      { email }
-    );
+  logout(): void {
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
   }
 
-  resetPassword(email: string, token: string, newPassword: string) {
-    return this.http.post(
-      `${this.apiUrl}/auth/reset-password`,
-      { email, token, newPassword }
-    );
+  forgotPassword(request: ForgotPasswordRequest): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ForgotPassword`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ForgotPassword/reset-password`, request);
+  }
+
+  getToken(): string | null {
+    const currentUser = this.currentUserSubject.value;
+    return currentUser ? currentUser.token : null;
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
   }
 }

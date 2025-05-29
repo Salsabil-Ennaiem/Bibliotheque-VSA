@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Features.Parametre;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+
 public class ParametreController : ControllerBase
 {
     private readonly ParametreHandler _parametreHandler;
