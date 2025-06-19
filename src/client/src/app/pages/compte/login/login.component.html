@@ -12,7 +12,7 @@
                 <span class=" w-100">
                     <p-iconfield>
                     <p-inputicon  class="pi pi-envelope"/>
-                    <input pInputText id="email" type="email" [(ngModel)]="loginObj.emailId" class="w-100" name="email" placeholder="name@example.com">
+                    <input pInputText id="email" type="email" [(ngModel)]="loginObj.email" class="w-100" name="email" placeholder="name@example.com">
                     </p-iconfield>
                 </span>
             </div>
@@ -34,16 +34,3 @@
       </div>
     </div>
   </div>
-
-  <!--  loginObj:Bibliothecaire = new Bibliothecaire();
-  private biblioServ: BibliothecaireService;
-
-  constructor(biblioServ: BibliothecaireService) {
-    this.biblioServ = biblioServ;
-  }
-
-  OnLogin() {
-    this.biblioServ.login(this.loginObj).subscribe((res:IBibliothecaireModel) => {
-      alert("user ok");})
-    }
-      -->

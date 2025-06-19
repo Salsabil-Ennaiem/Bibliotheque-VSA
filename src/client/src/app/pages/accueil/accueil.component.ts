@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { RouterLink } from '@angular/router';
+import { InputTextModule } from 'primeng/inputtext';
 import { ListeLivresComponent } from '../bibliothecaire/livres/liste-livres/liste-livres.component';
 import { ListeNouveauteComponent } from '../bibliothecaire/nouveaute/liste-nouveaute/liste-nouveaute.component';
-import { InputTextModule } from 'primeng/inputtext';
 
 
 @Component({

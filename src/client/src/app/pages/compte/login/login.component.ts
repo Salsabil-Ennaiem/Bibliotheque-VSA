@@ -1,14 +1,14 @@
-import { Component , inject} from '@angular/core';
+import { Component } from '@angular/core';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import {  FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
+import {  FormsModule } from '@angular/forms';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Router, RouterLink } from '@angular/router';
-
 import { AuthService } from '../../../Services/auth.service';
+import { LoginRequest } from '../../../model/bibliothecaire.model';
 
 
 
@@ -19,47 +19,35 @@ import { AuthService } from '../../../Services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
- /* loginObj:Bibliothecaire = new Bibliothecaire();
-  biblioServ =inject(BibliothecaireService);
-  router=inject(Router);
+ loginObj: LoginRequest = {
+    email: '',
+    password: ''
+  };
 
-  OnLogin() {
-    this.biblioServ.login(this.loginObj).subscribe((res:IBibliothecaireModel) => {
-      alert("user ok");
-      localStorage.setItem("user",JSON.stringify(res))
-      this.router.navigateByUrl('/bibliothecaire/');
-    
-    },
-      error=>{
-        alert("user not ok");})
-    }*/
- 
-  loginObj = { emailId: '', password: '' };
   isLoading = false;
-  errorMessage = '';
+  errorMessage: string | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  OnLogin() {
+  OnLogin(): void {
+    this.errorMessage = null;
+    if (!this.loginObj.email || !this.loginObj.password) {
+      this.errorMessage = 'Veuillez saisir votre email et mot de passe.';
+      return;
+    }
+
     this.isLoading = true;
-    this.authService.login(this.loginObj.emailId, this.loginObj.password)
-      .subscribe({
-        error: (err: unknown) => {
-          this.errorMessage = this.getErrorMessage(err);
-          this.isLoading = false;
-        }      });
+    this.authService.login(this.loginObj).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['bibliothecaire']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err.error?.message || 'Erreur lors de la connexion.';
+      }
+    });
   }
-
-  private getErrorMessage(err: any): string {
-    if (err.status === 401) return 'Email/mot de passe incorrect';
-    if (err.status === 423) return 'Compte verrouillé';
-    return 'Erreur serveur';
-  }
- loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(8)])
-  });
-
 }
   
 

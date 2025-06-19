@@ -14,7 +14,7 @@ export enum Statut_liv
     }
     
 export interface LivreDTO {
-    id_livre: string;
+    id_livre: string ;
   date_edition: string;
   titre: string;
   auteur?: string;

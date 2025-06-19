@@ -17,6 +17,7 @@ export interface CreateNouveauteRequest {
 }
 
 export interface NouveauteGetALL {
+    id_nouv: string;
     date_publication: string;
     couverture: string | null;
     titre: string | null;

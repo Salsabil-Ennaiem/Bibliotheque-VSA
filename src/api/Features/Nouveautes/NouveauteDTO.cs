@@ -20,6 +20,7 @@ namespace api.Features.Nouveautes
     }
     public class NouveauteGetALL
     {
+        public string?  id_nouv { get; set; }
         public DateTime date_publication { get; set; } = DateTime.UtcNow;
         public string? couverture { get; set; }
         public string? titre { get; set; }

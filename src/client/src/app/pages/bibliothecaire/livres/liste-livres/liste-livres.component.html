@@ -61,7 +61,7 @@
                                         {{ livre.statut }}
                                     </span>
                                 </div>
-                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id_livre , livre)"
+                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id_livre)"
                                     direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
                             </div>
                         </div>
@@ -102,7 +102,7 @@
                                         {{ livre.statut }}
                                     </span>
                                 </div>
-                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id_livre , livre)"
+                                <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(livre.id_livre)"
                                     direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
                             </div>
                         </div>

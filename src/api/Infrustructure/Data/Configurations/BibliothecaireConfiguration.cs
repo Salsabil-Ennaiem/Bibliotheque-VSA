@@ -19,6 +19,8 @@ namespace Data.Configurations;
                 .HasMaxLength(100)
                 .IsRequired();
 
+                //builder.Property(e=> e.Email).un
+
 
             builder.HasMany(e => e.Membres)
                 .WithOne(m => m.Bibliothecaire)

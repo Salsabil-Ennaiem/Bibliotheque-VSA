@@ -1,1 +1,148 @@
-<p>modifier-livres works!</p>
+<div class="d-flex justify-content-center align-items-center min-vh-100 p-3">
+    <div class="rounded-4 shadow" style="background-color: rgba(195, 242, 191, 0.188); width: 100%; max-width: 800px;">
+        <div class="header p-5 pb-4 border-bottom-0">
+            <h1 class="text-center fw-bold">Modifier Livre</h1>
+        </div>
+
+        <div class="p-5 pt-0">
+            <form id="ModifierLiv" (ngSubmit)="editLivre(livre , livreId)">
+                <div class="row">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <!-- Cote Livre -->
+                        <div class="mb-3">
+                            <label for="cote" class="form-label">Cote Livre</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-barcode" /> <!-- Better icon for ID/code -->
+                                    <input pInputText id="cote" type="text" [(ngModel)]="livre.cote_liv" class="w-100"
+                                        name="cote" placeholder="Ex: A39-B12">
+                                </p-iconfield>
+                            </span>
+                        </div>
+                    
+                        <!-- Auteur -->
+                        <div class="mb-3">
+                            <label for="auteur" class="form-label">Auteur</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-user-edit" /> <!-- Author/writer icon -->
+                                    <input pInputText id="auteur" type="text" [(ngModel)]="livre.auteur" class="w-100"
+                                        name="auteur" placeholder="Ex: Antoine de Saint-Exupéry">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+
+
+                        <!-- Editeur -->
+                        <div class="mb-3">
+                            <label for="editeur" class="form-label">Éditeur</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-building" />
+                                    <input pInputText id="editeur" type="text" [(ngModel)]="livre.editeur"
+                                        class="w-100" name="editeur" placeholder="Ex: Gallimard">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+                        <!--Langue-->
+                        <div class="mb-3">
+                            <label for="langue" class="form-label">Langue</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-language" /> <!-- Language icon -->
+                                    <input pInputText id="langue" type="text" [(ngModel)]="livre.langue" class="w-100" name="langue" placeholder="Ex: Français">
+                                    </p-iconfield>
+                            </span>
+                                    </div>
+
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <!-- Titre Livre -->
+                        <div class="mb-3">
+                            <label for="Titre" class="form-label">Titre du Livre</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-bookmark" /> <!-- Better for book title -->
+                                    <input pInputText id="Titre" type="text" [(ngModel)]="livre.Titre" class="w-100"
+                                        name="Titre" placeholder="Ex: Le Petit Prince">
+                                </p-iconfield>
+                            </span>
+                        </div>
+
+                        <!-- ISBN & Inventaire (side by side) -->
+                        <div class="row"> 
+                            <div class="col-md-6 mb-3">  
+                                <label for="isbn" class="form-label">ISBN</label>
+                                <span class="w-100">
+                                    <p-iconfield>
+                                        <p-inputicon class="pi pi-qrcode" /> <!-- ISBN = unique code -->
+                                        <input pInputText id="isbn" [(ngModel)]="livre.isbn" type="text" class="w-100"
+                                            name="isbn" placeholder="Ex: 978-3-16-148410-0">
+                                    </p-iconfield>
+                                </span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="inventaire" class="form-label">N° Inventaire</label>
+                                <span class="w-100">
+                                    <p-iconfield>
+                                        <p-inputicon class="pi pi-list" /> <!-- Inventory number -->
+                                        <input pInputText id="inventaire" [(ngModel)]="livre.inventaire" type="text" class="w-100"
+                                            name="inventaire" placeholder="Ex: INV-2023-001">
+                                    </p-iconfield>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Date Edition -->
+                        <div class="mb-3">
+                            <label for="date_edition" class="form-label">Date d'Édition</label>
+                            <span class="w-100">
+                                <p-iconfield>
+                                    <p-inputicon class="pi pi-calendar" /> <!-- Calendar icon for date -->
+                                    <input pInputText id="date_edition" [(ngModel)]="livre.date_edition" type="text" class="w-100"
+                                        name="date_edition" placeholder="Ex: 2023">
+                                </p-iconfield>
+                            </span>
+                        </div>
+                                                <!-- Etat Livre -->
+                        <div class="mb-3">
+                            <label for="selectEtat_Livre" class="form-label">État du Livre</label>
+                            <p-select [options]="selectEtat_Livre" [(ngModel)]="livre.Etat_Livre"
+                                optionLabel="label" placeholder="Sélectionnez un état" styleClass="w-100"
+                                name="selectEtat_Livre"></p-select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <span class="w-100">
+                                <textarea pTextarea  pInputTextarea id="description" [(ngModel)]="livre.description" class="w-100"
+                                    name="description" rows="3" placeholder="Résumé du livre..."></textarea>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button pButton label="Annuler" type="reset"  icon="pi pi-times" styleClass="p-button-secondary" [raised]="true"
+                      routerLink="livres">
+                      </button>
+                    <button pButton label="Enregistrer" icon="pi pi-check" styleClass="p-button-success" [raised]="true"
+                        type="submit">
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

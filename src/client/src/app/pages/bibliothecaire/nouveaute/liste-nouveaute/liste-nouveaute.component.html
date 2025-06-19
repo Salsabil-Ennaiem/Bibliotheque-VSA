@@ -1,28 +1,42 @@
 <div class="carousel-container">
-    <div class="card nouveautes-card">
-        <div class="carousel-header">
-            <h1>Nouveautés</h1>
-            <p-button *ngIf="!isHosted" label="Ajouter" icon="pi pi-plus" routerLink="/ajouter"> </p-button>
-        </div>
-        <p-carousel [value]="publication || []" [numVisible]="3" [numScroll]="1" [circular]="true"
-            [responsiveOptions]="responsiveOptions" [autoplayInterval]="0" [showNavigators]="true"
-            [showIndicators]="true">
-            <ng-template let-pub pTemplate="item">
-                <div class="pub-card" [routerLink]="['/product-detail', pub.id]">
-                    <div class="image-container position-relative">
-                        <img src="{{ pub.image }}" [alt]="pub.titre" class="pub-image" />
-                        <p-tag [value]="pub.inventoryStatus" [severity]="pub.severity" class="status-tag"
-                            styleClass="dark:!bg-surface-900 text-xs" />
-                        <p-speeddial *ngIf="!isHosted" class="speed-dial" [model]="getSpeedDialItems(pub.id)"
-                            direction="down" showIcon="pi pi-ellipsis-v" (click)="$event.stopPropagation()" />
-                    </div>
-
-                    <footer>
-                        <div class="pub-name">{{ pub.name }}</div>
-                    </footer>
-
-                </div>
-            </ng-template>
-        </p-carousel>
+  <div class="card nouveautes-card">
+    <div class="carousel-header d-flex justify-content-between align-items-center">
+      <h1>Nouveautés</h1>
+      <div class="d-flex align-items-center gap-2">
+        <p-button *ngIf="!isHosted" label="Ajouter" icon="pi pi-plus" (click)="onAjouter()" styleClass="p-button-success"></p-button>
+      </div>
     </div>
+
+    <p-carousel [value]="nouveautes || []" [numVisible]="3" [numScroll]="1" [circular]="true"
+                [autoplayInterval]="0" [showNavigators]="true" [showIndicators]="true">
+      <ng-template let-nouv pTemplate="item">
+        <div class="pub-card" style="position: relative; cursor: pointer;" (click)="showDetails(nouv.id_nouv)">
+          <span class="badge position-absolute top-0 start-0 m-2"
+                [ngClass]="{
+                  'bg-success': nouv.statut === 'Disponible',
+                  'bg-warning': nouv.statut === 'Emprunté',
+                  'bg-danger': nouv.statut === 'Perdu'
+                }" *ngIf="nouv.statut">
+            {{ nouv.statut }}
+          </span>
+
+          <div class="image-container position-relative">
+            <img [src]="nouv.couverture || 'assets/default-cover.jpg'" [alt]="nouv.titre" class="pub-image" />
+          </div>
+
+          <footer>
+            <div class="pub-name">{{ nouv.titre }}</div>
+            <div class="pub-date">{{ nouv.date_publication | date:'mediumDate' }}</div>
+          </footer>
+
+          <p-speeddial *ngIf="!isHosted" class="speed-dial"
+                       [model]="getSpeedDialItems(nouv.id_nouv)"
+                       direction="down"
+                       showIcon="pi pi-ellipsis-v"
+                       (click)="$event.stopPropagation()">
+          </p-speeddial>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
 </div>

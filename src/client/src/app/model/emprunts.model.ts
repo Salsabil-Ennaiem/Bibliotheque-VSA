@@ -28,7 +28,7 @@ export interface EmppruntDTO {
     prenom: string | null;
     email: string | null;
     telephone: string | null;
-    cin_ou_passeport: string | null;
+    cin_ou_passeport: string ;
     statut: StatutMemb;
 }
 

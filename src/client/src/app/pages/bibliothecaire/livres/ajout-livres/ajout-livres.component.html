@@ -5,7 +5,7 @@
         </div>
 
         <div class="p-5 pt-0">
-            <form id="AjouterLiv" (ngSubmit)="Ajouter()">
+            <form id="AjouterLiv" (ngSubmit)="Ajouter(livre)">
                 <div class="row">
                     <!-- Left Column -->
                     <div class="col-md-6">
@@ -14,7 +14,7 @@
                             <label for="cote" class="form-label">Cote Livre</label>
                             <span class="w-100">
                                 <p-iconfield>
-                                    <p-inputicon class="pi pi-barcode" /> <!-- Better icon for ID/code -->
+                                    <p-inputicon class="pi pi-barcode" /> 
                                     <input pInputText id="cote" type="text" [(ngModel)]="livre.cote" class="w-100"
                                         name="cote" placeholder="Ex: A39-B12">
                                 </p-iconfield>
@@ -136,9 +136,9 @@
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between mt-4">
                     <p-button label="Annuler" icon="pi pi-times" styleClass="p-button-secondary" [raised]="true"
-                        (click)="Annuler()"></p-button>
+                      routerLink="livres"  ></p-button>
                     <p-button label="Enregistrer" icon="pi pi-check" styleClass="p-button-success" [raised]="true"
-                        (click)="Ajouter()"></p-button>
+                        ></p-button>
                 </div>
             </form>
         </div>

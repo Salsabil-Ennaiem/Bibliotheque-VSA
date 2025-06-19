@@ -36,8 +36,10 @@ public class UserSeeder
 
             var users = new List<(string email, string password, string nom, string prenom)>
             {
+
                 ("ennaiemsalsabil@gmail.com", "Admin@123", "Admin", "User"),
                 ("salsabinaim15@gmail.com", "Biblio@123", "Salsabil", "Naim")
+
             };
 
             var createdUserIds = new List<string>();

@@ -20,6 +20,8 @@ using Npgsql;
 using api.Features.Auth.ForgetPassword;
 using api.Features.Profile;
 using Infrastructure.Repositories;
+using LibraryManagement.Features.Dashboard.Repositories;
+using LibraryManagement.Features.Dashboard.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,13 +79,8 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddHttpContextAccessor();
 
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("Angular", policy =>
-        policy.WithOrigins("https://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+
+
 builder.Services.AddRateLimiter(options =>
 {
     options.AddPolicy("login", httpContext =>
@@ -96,6 +93,11 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
+// Add these services
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddSignalR();
+
 builder.Services.AddScoped<IRepository<Nouveaute>, Repository<Nouveaute>>();
 builder.Services.AddScoped<IRepository<Emprunts>, Repository<Emprunts>>();
 builder.Services.AddScoped<IRepository<Parametre>, Repository<Parametre>>();
@@ -104,6 +106,7 @@ builder.Services.AddScoped<IRepository<Livres>, Repository<Livres>>();
 
 builder.Services.AddScoped<Repository<Parametre>>();
 builder.Services.AddScoped<Repository<Sanction>>();
+builder.Services.AddScoped<Repository<Membre>>();
 
 builder.Services.AddScoped<ILivresRepository, LivresRepository>();
 builder.Services.AddScoped<IEmpruntsRepository, EmpruntsRepository>();
@@ -135,6 +138,23 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "Biruni Scraper", Version = "v1" });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") 
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); //  l’authentification par cookie
+    });
+});
+
+// Masquer les metadata
+/*builder.Services.Configure<ServerOptions>(options => {
+    options.AddServerHeader = false;
+});*/
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -165,10 +185,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseRouting();// After app.UseRouting()
+app.MapHub<DashboardHub>("/dashboardHub");
+app.UseCors("AllowAngularDevClient");
 
-
-
-app.UseCors("Angular");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();

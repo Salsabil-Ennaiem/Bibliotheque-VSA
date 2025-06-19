@@ -9,54 +9,29 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
-interface Livres {
-  cote: string;
-  editeur: string;
-  date_edition: string;
-  Etat_Livre: Etat_Liv | null;
-  Titre: string;
-  isbn: string;
-  inventaire: string;
-  auteur: string;
-  image: string;
-  description :string;
-  langue: string;
-}
+import { RouterLink } from '@angular/router';
+import { LivreService } from '../../../../Services/livre.service';
+import { CreateLivreRequest, EtatLiv } from '../../../../model/Livres.model';
 
-interface Etat_Liv {
-  label: string;
-  value: string;
-}
 
 @Component({
   selector: 'app-ajout-livres',
-  imports: [IconFieldModule, InputIconModule, InputTextModule, FormsModule, IftaLabelModule, CommonModule, ButtonModule, SelectModule , Textarea ],
+  imports: [ RouterLink,IconFieldModule, InputIconModule, InputTextModule, FormsModule, IftaLabelModule, CommonModule, ButtonModule, SelectModule , Textarea ],
   templateUrl: './ajout-livres.component.html',
   styleUrl: './ajout-livres.component.css'
 })
 export class AjoutLivresComponent {
-selectEtat_Livre: Etat_Liv[] = [
-    { label: 'Nuef', value: 'Nuef' },
-    { label: 'Moyen', value: 'Moyen' },
-    { label: 'Mauvais', value: 'Mauvais' }
-  ];
-  livre: Livres = {
-    cote: '',
-    editeur: '',
-    Etat_Livre: this.selectEtat_Livre[2],
-    date_edition: '',
-    Titre: '',
-    isbn: '',
-    inventaire: '',
-    image: '',
-    auteur: '',
-    description: '',
-    langue: ''
-  };
-  Annuler() {
-    console.log("annuler ok");
-  }
-  Ajouter() {
-    console.log("ajouter ok");
-  }
+    livre: CreateLivreRequest |any;
+  selectEtat_Livre: EtatLiv[] = [];
+  
+  constructor(private livreService: LivreService) { }
+
+  Ajouter( livre: CreateLivreRequest) {
+      this.livreService.create( livre).subscribe(
+        () => console.log('Livre updated successfully'),
+        error => console.error('Error updating livre:', error)
+      );
+    }
+  
+  
 }

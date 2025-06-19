@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { AccueilComponent } from './pages/accueil/accueil.component';
 import { CompteComponent } from './pages/compte/compte.component';
 import { LoginComponent } from './pages/compte/login/login.component';
 import { MdpOublieeComponent } from './pages/compte/mdp-oubliee/mdp-oubliee.component';
@@ -22,6 +21,7 @@ import { ErreurComponent } from './pages/erreur/erreur.component';
 import { SanctionsComponent } from './pages/bibliothecaire/sanctions/sanctions.component';
 import { AjoutSanctionComponent } from './pages/bibliothecaire/sanctions/ajout-sanction/ajout-sanction.component';
 import { ListSanctionsComponent } from './pages/bibliothecaire/sanctions/list-sanctions/list-sanctions.component';
+import { AccueilComponent } from './pages/accueil/accueil.component';
 
 
 export const routes: Routes = [
@@ -38,7 +38,7 @@ export const routes: Routes = [
         {path:'sanctions' , component:SanctionsComponent ,
           children:[
              {path:'',component:ListSanctionsComponent },
-            {path:'ajouter',component:AjoutSanctionComponent }
+            {path:'ajouter/:id',component:AjoutSanctionComponent }
           ]
         } ,
         {path:'nouveaute', component :NouveauteComponent ,

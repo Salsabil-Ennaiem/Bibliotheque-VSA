@@ -6,11 +6,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SpeedDialModule } from 'primeng/speeddial';
-//import { SelectModule } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkWithHref } from '@angular/router';
 import { LivreService } from '../../../../Services/livre.service';
-import { LivreDTO, livres, UpdateLivreDTO } from '../../../../model/Livres.model';
+import { LivreDTO } from '../../../../model/Livres.model';
 
 
 
@@ -39,7 +38,7 @@ export class ListeLivresComponent {
   searchQuery = '';
   livres: LivreDTO[] = [];
 
-  constructor(private livreService: LivreService) { };
+  constructor(private livreService: LivreService ,private router: Router) { };
   ngOnInit(): void {
     this.livreService.getAll().subscribe(
       data => this.livres = data,
@@ -213,6 +212,17 @@ editeur : 'Gallimard',
     this.isInputVisible = true;
   }
 
+  getBooks(): void {
+    this.livreService.getAllLiv().subscribe(
+      (livres: LivreDTO[]) => {
+        this.livres = livres;
+      },
+      (error) => {
+        console.error('Error fetching livres:', error);
+      }
+    );
+  }
+
   handleSearch(event: Event) {
     const value = (event.target as HTMLInputElement).value;
     this.searchQuery = value;
@@ -239,13 +249,13 @@ editeur : 'Gallimard',
   }
 
 
-  getSpeedDialItems(livreId: string, livresDto: UpdateLivreDTO): MenuItem[] {
+  getSpeedDialItems(livreId: string): MenuItem[] {
     return [
 
       {
         label: 'Modifier',
         icon: 'pi pi-pencil',
-        command: () => this.editLivre(livreId, livresDto)
+        command: () => this.editLivre(livreId)
       },
       {
         label: 'Supprimer',
@@ -294,13 +304,11 @@ editeur : 'Gallimard',
     );
   }
 
-  editLivre(livreId: string, LivreDTO: UpdateLivreDTO) {
-    console.log(`Edit livre ID: ${livreId}`);
-    this.livreService.update(livreId, LivreDTO).subscribe(
-      () => console.log('Livre updated successfully'),
-      error => console.error('Error updating livre:', error)
-    );
-  }
+   
+
+ editLivre(livreId: string) {
+  console.log(`Navigating to edit livre ID: ${livreId}`);
+  this.router.navigate([`/bibliothecaire/livres/modifier/${livreId}`]);}
 
   deleteLivre(livreId: string) {
     console.log(`Delete livre ID: ${livreId}`);
