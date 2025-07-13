@@ -7,10 +7,10 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { NouveauteService } from '../../../../Services/nouveaute.service';
-import { NouveauteGetALL } from '../../../../model/Nouveaute.model';
+import { NouveauteGetALL } from '../../../../model/nouveaute.model';
 //import { NouveauteDTO, NouveauteGetALL } from '../../../../model/Nouveaute.model';
 //import { NouveauteService } from '../../../../Services/Nouveaute.service';
- 
+
 @Component({
   selector: 'app-liste-nouveaute',
   imports: [ButtonModule, CarouselModule, TagModule, SpeedDialModule, CommonModule],
@@ -19,17 +19,22 @@ import { NouveauteGetALL } from '../../../../model/Nouveaute.model';
   providers: []
 })
 export class ListeNouveauteComponent implements OnInit {
- nouveautes: NouveauteGetALL[] = [];
- // isHosted = false; // selon votre logique
-
+  nouveautes: NouveauteGetALL[] = [];
+  today: number = Date.now(); // Current timestamp in milliseconds
+  isNewPublication(datePublication: string | null): boolean {
+    if (!datePublication) return false;
+    const pubDate = new Date(datePublication).getTime();
+    const yearAgo = this.today - (365 * 24 * 60 * 60 * 1000);
+    return pubDate > yearAgo;
+  }
   @Input() isHosted: boolean = false;
 
   ngOnInit(): void {
     this.loadNouveautes();
   }
-constructor(private router: Router , private nouveauteService: NouveauteService) {}
+  constructor(private router: Router, private nouveauteService: NouveauteService) { }
   loadNouveautes(): void {
-    this.nouveauteService.getAll().subscribe({
+    this.nouveauteService.getAllNouv().subscribe({
       next: (data) => this.nouveautes = data,
       error: (err) => console.error('Erreur chargement nouveautés', err)
     });
@@ -78,4 +83,3 @@ constructor(private router: Router , private nouveauteService: NouveauteService)
     }
   }
 }
-  

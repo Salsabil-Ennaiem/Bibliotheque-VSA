@@ -28,14 +28,14 @@ namespace api.Features.Nouveautes
             }
             return userId;
         }
-
+//list genral
         public async Task<IEnumerable<NouveauteGetALL>> GetAllNouvAsync()
         {
             var rt = await _nouveauteRepository.GetAllNouvAsync();
-           return rt.Adapt<IEnumerable<NouveauteGetALL>>();
+            return rt.Adapt<IEnumerable<NouveauteGetALL>>();
 
         }
-
+   //list specifique
         public async Task<IEnumerable<NouveauteGetALL>> GetAllAsync()
         {
             var userId = GetCurrentUserId();
@@ -43,7 +43,6 @@ namespace api.Features.Nouveautes
             var filtered = entities.Where(e => e.id_biblio == userId);
             return filtered.Adapt<IEnumerable<NouveauteGetALL>>();
         }
-
         public async Task<NouveauteDTO> GetByIdAsync(string id)
         {
             var userId = GetCurrentUserId();
@@ -54,7 +53,6 @@ namespace api.Features.Nouveautes
             }
             return entity.Adapt<NouveauteDTO>();
         }
-
         public async Task<NouveauteDTO> CreateAsync(CreateNouveauteRequest createNouveaute)
         {
               var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -73,7 +71,6 @@ namespace api.Features.Nouveautes
             var created = await _nouveauteRepository.CreateAsync(entity);
             return created.Adapt<NouveauteDTO>();
         }
-
         public async Task<NouveauteDTO> UpdateAsync(CreateNouveauteRequest nouveaute, string id)
         {
             var entity = nouveaute.Adapt<Nouveaute>();

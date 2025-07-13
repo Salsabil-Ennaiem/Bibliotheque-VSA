@@ -14,7 +14,9 @@
     height: 100%;
     vertical-align :center;
   }
-
+.badge{
+  z-index: 10;
+}
   .pub-card:hover {
     transform: translateY(-3px);
     pointer-events: stroke;

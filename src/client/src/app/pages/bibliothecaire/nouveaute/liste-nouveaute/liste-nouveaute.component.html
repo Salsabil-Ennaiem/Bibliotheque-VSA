@@ -11,14 +11,21 @@
                 [autoplayInterval]="0" [showNavigators]="true" [showIndicators]="true">
       <ng-template let-nouv pTemplate="item">
         <div class="pub-card" style="position: relative; cursor: pointer;" (click)="showDetails(nouv.id_nouv)">
-          <span class="badge position-absolute top-0 start-0 m-2"
+         <!--<span class="badge position-absolute top-0 start-0 m-2"
                 [ngClass]="{
                   'bg-success': nouv.statut === 'Disponible',
                   'bg-warning': nouv.statut === 'Emprunté',
                   'bg-danger': nouv.statut === 'Perdu'
                 }" *ngIf="nouv.statut">
             {{ nouv.statut }}
-          </span>
+          </span>--> 
+          
+          <span class="badge position-absolute top-0 start-0 m-2"
+      [ngClass]="{
+        'bg-success': isNewPublication(nouv?.date_publication)
+      }">
+  Nouveau
+</span>
 
           <div class="image-container position-relative">
             <img [src]="nouv.couverture || 'assets/default-cover.jpg'" [alt]="nouv.titre" class="pub-image" />

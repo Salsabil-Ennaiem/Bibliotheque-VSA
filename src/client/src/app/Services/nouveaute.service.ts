@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateNouveauteRequest, NouveauteDTO, NouveauteGetALL } from '../model/Nouveaute.model';
+import { CreateNouveauteRequest, NouveauteDTO, NouveauteGetALL } from '../model/nouveaute.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ export class NouveauteService {
 
 
    private apiUrl = 'http://localhost:5232/api/Nouveaute'; 
+
 
   constructor(private http: HttpClient) { }
 

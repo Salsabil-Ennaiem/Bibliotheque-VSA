@@ -3,7 +3,7 @@
 export interface NouveauteDTO {
     id_nouv: string | null;
     titre: string | null;
-    fichier: { [key: string]: any; } | null;
+    fichier: { [key: string]: any; } ;
     description: string | null;
     date_publication: string;
     couverture: string | null;
