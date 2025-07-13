@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import {  FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';

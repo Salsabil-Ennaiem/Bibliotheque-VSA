@@ -6,19 +6,15 @@ using domain.Interfaces;
 using Mapster;
 
 namespace api.Features.Livre;
-
 public class LivresHandler
 {
     private readonly ILivresRepository _livresRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-
-
     public LivresHandler(ILivresRepository livresRepository, IHttpContextAccessor httpContextAccessor)
     {
         _livresRepository = livresRepository;
         _httpContextAccessor = httpContextAccessor;
     }
-
     public async Task<IEnumerable<LivreDTO>> GetAllLivresAsync()
     {
         var entity = await _livresRepository.GetAllAsync();

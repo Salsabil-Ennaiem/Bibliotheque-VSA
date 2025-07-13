@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Data.Configurations;
 using domain.Entity;
+using Domaine.Entity;
 
 
 namespace Data;
@@ -25,22 +26,23 @@ public class BiblioDbContext : IdentityDbContext<Bibliothecaire>
         public DbSet<Nouveaute> Nouveautes { get; set; }
         public DbSet<Sanction> Sanctions { get; set; }
         public DbSet<Membre> Membres { get; set; }
+        public DbSet<Fichier> Fichiers { get; set; }
 
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder); 
-
-            modelBuilder.ApplyConfiguration(new EmpruntConfiguration());
-            modelBuilder.ApplyConfiguration(new LivreConfiguration());
-            modelBuilder.ApplyConfiguration(new InventaireConfiguration());
-            modelBuilder.ApplyConfiguration(new BibliothecaireConfiguration());
-            modelBuilder.ApplyConfiguration(new StatistiqueConfiguration());
-            modelBuilder.ApplyConfiguration(new ParametreConfiguration());
-            modelBuilder.ApplyConfiguration(new NouveauteConfiguration());
-            modelBuilder.ApplyConfiguration(new SanctionConfiguration());
-            modelBuilder.ApplyConfiguration(new MembreConfiguration());
-        }
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new EmpruntConfiguration());
+        modelBuilder.ApplyConfiguration(new LivreConfiguration());
+        modelBuilder.ApplyConfiguration(new InventaireConfiguration());
+        modelBuilder.ApplyConfiguration(new BibliothecaireConfiguration());
+        modelBuilder.ApplyConfiguration(new StatistiqueConfiguration());
+        modelBuilder.ApplyConfiguration(new ParametreConfiguration());
+        modelBuilder.ApplyConfiguration(new NouveauteConfiguration());
+        modelBuilder.ApplyConfiguration(new FichierConfiguration());
+        modelBuilder.ApplyConfiguration(new SanctionConfiguration());
+        modelBuilder.ApplyConfiguration(new MembreConfiguration());
+    }
        
 }

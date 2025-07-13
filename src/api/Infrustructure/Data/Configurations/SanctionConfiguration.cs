@@ -43,19 +43,5 @@ namespace Data.Configurations;
                     .HasColumnType("text");
 
 
-
-                entity.HasOne(e => e.Membre)
-                    .WithMany(m => m.Sanctions)
-                    .HasForeignKey(e => e.id_membre);
-
-                entity.HasOne(e => e.Emprunt)
-                    .WithMany(e => e.Sanctions)
-                    .HasForeignKey(e => e.id_emp)
-                    .IsRequired(false);
-
-                entity.HasOne(e => e.Bibliothecaire)
-                    .WithMany(b => b.Sanctions)
-                    .HasForeignKey(e => e.id_biblio)
-                    .IsRequired(false);
         }
     }

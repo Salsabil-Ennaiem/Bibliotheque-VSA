@@ -54,20 +54,12 @@ namespace Data.Configurations;
                 entity.HasIndex(e => e.email)
                     .IsUnique();
 
+        entity.HasMany(e => e.Emprunts)
+            .WithOne(e => e.Membre)
+            .HasForeignKey(e => e.id_membre);
 
-                entity.HasOne(e => e.Bibliothecaire)
-                    .WithMany(b => b.Membres)
-                    .HasForeignKey(e => e.id_biblio)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasMany(e => e.Emprunts)
-                    .WithOne(e => e.Membre)
-                    .HasForeignKey(e => e.id_membre)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasMany(e => e.Sanctions)
-                    .WithOne(s => s.Membre)
-                    .HasForeignKey(s => s.id_membre)
-                    .OnDelete(DeleteBehavior.SetNull);
+        entity.HasMany(e => e.Sanctions)
+            .WithOne(s => s.Membre)
+            .HasForeignKey(s => s.id_membre);
         }
     }

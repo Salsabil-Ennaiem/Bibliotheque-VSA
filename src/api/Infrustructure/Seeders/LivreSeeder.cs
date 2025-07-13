@@ -56,8 +56,7 @@ public class LivreSeeder
                 isbn = "978-2-3333-4444-5",
                 editeur = "Editions JS",
                 Description = "JavaScript pour experts",
-                Langue = "Français" ,
-                couverture ="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.s-bol.com%2FgvNWrkL4p0j%2F550x778.jpg&f=1&nofb=1&ipt=356c8656df7f36264c9b4360fdcca8ef141f447066a0d2fee0bdb8876b137a87"
+                Langue = "Français" 
             }
         };
 

@@ -1,4 +1,3 @@
-
 namespace domain.Entity;
 
     public class Statistique

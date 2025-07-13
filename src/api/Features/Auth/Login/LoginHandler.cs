@@ -34,6 +34,7 @@ namespace api.Features.Auth.Login
             try
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
+               
                 if (user == null)
                     throw new UnauthorizedAccessException("Invalid credentials");
 
@@ -43,7 +44,7 @@ namespace api.Features.Auth.Login
                 if (_userManager.Options.SignIn.RequireConfirmedEmail && !await _userManager.IsEmailConfirmedAsync(user))
                     throw new UnauthorizedAccessException("Email not confirmed. Please check your email inbox.");
 
-                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true); // Enable lockout
+                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true); 
                 if (!result.Succeeded)
                 {
                     if (result.IsLockedOut)

@@ -32,14 +32,5 @@ namespace Data.Configurations;
                     .HasMaxLength(1000);
 
 
-                    entity.HasOne(e => e.Bibliothecaire)
-                          .WithMany(b => b.Parametres)
-                          .HasForeignKey(e => e.IdBiblio)
-                          .OnDelete(DeleteBehavior.SetNull);
-                  
-                     entity.HasOne(e => e.Statistiques)
-                        .WithOne(s => s.Parametre)
-                        .HasForeignKey<Statistique>(e => e.id_param)
-                        .OnDelete(DeleteBehavior.SetNull); 
         }
     }

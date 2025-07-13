@@ -44,14 +44,12 @@ public class LivreConfiguration : IEntityTypeConfiguration<Livres>
             .IsUnique();
 
 
-        entity.HasOne(e => e.Bibliothecaire)
-            .WithMany(b => b.Livres)
-            .HasForeignKey(e => e.id_biblio)
-            .OnDelete(DeleteBehavior.SetNull);
+        entity.HasOne(e => e.Fichiers)
+            .WithOne(b => b.Livre)
+            .HasForeignKey<Livres>(e => e.couverture);
 
         entity.HasMany(e => e.Inventaires)
             .WithOne(i => i.Livre)
-            .HasForeignKey(i => i.id_liv)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasForeignKey(i => i.id_liv);
     }
 }

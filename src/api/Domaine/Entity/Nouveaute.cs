@@ -1,15 +1,18 @@
+using Domaine.Entity;
 
 namespace domain.Entity;
 
-    public class Nouveaute
-    {
-        public string?  id_nouv { get; set; }
-        public string?  id_biblio { get; set; }
-        public string? titre { get; set; }
-        public Dictionary<string, object>? fichier { get; set; }
-        public string? description { get; set; }
-        public DateTime date_publication { get; set; } = DateTime.UtcNow;
-        public string couverture { get; set; }="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Favf.asso.fr%2Famboise%2Fwp-content%2Fuploads%2Fsites%2F171%2F2021%2F03%2FLogo-Nouveau.jpg&f=1&nofb=1&ipt=fdbaaa07e45eb9aa0e1f8802a963c3259485319662623816e07adf250d84f1f9";
-        public virtual Bibliothecaire? Bibliothecaire { get; set; }
+public class Nouveaute
+{
+    public string? id_nouv { get; set; }
+    public string? id_biblio { get; set; }
+    public string? titre { get; set; }
+    public string? fichier { get; set; }
+    public string? description { get; set; }
+    public DateTime date_publication { get; set; } = DateTime.UtcNow;
+    public string? couverture { get; set; }
+    public virtual Bibliothecaire? Bibliothecaire { get; set; }
+    public virtual ICollection<Fichier>? Fichiers { get; set; }
+    public virtual Fichier? Couvertures { get; set; }
 
-    }
+}
