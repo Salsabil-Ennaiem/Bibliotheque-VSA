@@ -30,7 +30,7 @@ namespace api.Features.Nouveautes
             return Ok(nouveautes);
         }
 
-        [Authorize]
+       // [Authorize]
 
         [HttpGet("Get{id}")]
         public async Task<IActionResult> GetById(string id)

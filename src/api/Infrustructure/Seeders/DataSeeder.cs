@@ -44,7 +44,7 @@ public static class DataSeeder
                 if (!hasLivres)
                 {
                     Console.WriteLine("🌱 Seeding Livres...");
-                    livres = await LivreSeeder.SeedLivresAsync(dbContext, biblio1Id, biblio2Id);
+                    livres = await LivreSeeder.SeedLivresAsync(dbContext);
                 }
                 else
                 {
@@ -54,7 +54,7 @@ public static class DataSeeder
                 if (!hasInventaires && livres.Any())
                 {
                     Console.WriteLine("🌱 Seeding Inventaires...");
-                    inventaires = await InventaireSeeder.SeedInventairesAsync(dbContext, livres);
+                    inventaires = await InventaireSeeder.SeedInventairesAsync(dbContext, livres, biblio1Id, biblio2Id);
                 }
                 else if (hasInventaires)
                 {

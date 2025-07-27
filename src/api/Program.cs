@@ -104,16 +104,17 @@ builder.Services.AddScoped<IRepository<Parametre>, Repository<Parametre>>();
 builder.Services.AddScoped<IRepository<Sanction>, Repository<Sanction>>();
 builder.Services.AddScoped<IRepository<Livres>, Repository<Livres>>();
 
-builder.Services.AddScoped<Repository<Parametre>>();
+builder.Services.AddScoped<Repository<Parametre>>(); 
 builder.Services.AddScoped<Repository<Sanction>>();
 builder.Services.AddScoped<Repository<Membre>>();
+builder.Services.AddScoped<Repository<Nouveaute>>();
+
 
 builder.Services.AddScoped<ILivresRepository, LivresRepository>();
 builder.Services.AddScoped<IEmpruntsRepository, EmpruntsRepository>();
 builder.Services.AddScoped<IParametreRepository, ParametreRepository>();
 builder.Services.AddScoped<IScrapingRepository, ScrapingRepository>();
 builder.Services.AddScoped<ISanctionRepository, SanctionRepository>();
-builder.Services.AddScoped<INouveauteRepository, NouveauteRepository>();
 
 builder.Services.AddScoped<LivresHandler>();
 builder.Services.AddScoped<EmpruntHandler>();

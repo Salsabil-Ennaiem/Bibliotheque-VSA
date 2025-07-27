@@ -31,7 +31,7 @@ public class BookDataTransformer
             editeur = raw.Publisher != null ? CleanText(raw.Publisher) : "Inconnu",
             date_edition = year,
             couverture = raw.CoverImage,
-            id_biblio = "1" // Convert to string
+            //id_biblio = "1" // Convert to string
         };
         
         var inventaire = new Inventaire

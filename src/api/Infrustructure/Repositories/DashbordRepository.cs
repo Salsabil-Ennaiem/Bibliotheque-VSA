@@ -28,54 +28,53 @@ public class DashboardRepository : IDashboardRepository
 
         return query.Adapt<List<BookLoanCountDto>>();
     }
+      public async Task<List<BookRotationRateDto>> GetBookRotationRatesAsync(string biblioId)
+      {
+          var query = await (from i in _context.Inventaires
+                            join l in _context.Livres on i.id_liv equals l.id_livre
+                            where i.id_biblio == biblioId
+                            let totalCopies = _context.Inventaires.Count()
+                            let loanCount = (from e in _context.Emprunts
+                                            join inv in _context.Inventaires on e.Id_inv equals inv.id_inv
+                                            select e).Count()
+                            where totalCopies > 0
+                            select new
+                            {
+                                BookTitle = l.titre,
+                                RotationRate = totalCopies > 0 ? (decimal)loanCount / totalCopies : 0,
+                                Available = totalCopies - loanCount,
+                                Loaned = loanCount
+                            })
+                            .OrderByDescending(x => x.RotationRate)
+                            .ToListAsync();
 
-    public async Task<List<BookRotationRateDto>> GetBookRotationRatesAsync(string biblioId)
-    {
-        var query = await (from l in _context.Livres
-                          where l.id_biblio == biblioId
-                          let totalCopies = _context.Inventaires.Count(i => i.id_liv == l.id_livre)
-                          let loanCount = (from e in _context.Emprunts
-                                          join i in _context.Inventaires on e.Id_inv equals i.id_inv
-                                          where i.id_liv == l.id_livre
-                                          select e).Count()
-                          where totalCopies > 0
-                          select new
-                          {
-                              BookTitle = l.titre,
-                              RotationRate = totalCopies > 0 ? (decimal)loanCount / totalCopies : 0,
-                              Available = totalCopies - loanCount,
-                              Loaned = loanCount
-                          })
-                          .OrderByDescending(x => x.RotationRate)
-                          .ToListAsync();
+          return query.Adapt<List<BookRotationRateDto>>();
+      }
 
-        return query.Adapt<List<BookRotationRateDto>>();
-    }
-
-    public async Task<List<UnusedBookDto>> GetUnusedBooksAsync(string biblioId, int monthsBack = 6)
-    {
-        var cutoffDate = DateTime.Now.AddMonths(-monthsBack);
-        var query = await (from l in _context.Livres
-                          where l.id_biblio == biblioId
-                          where !(from e in _context.Emprunts
-                                 join i in _context.Inventaires on e.Id_inv equals i.id_inv
-                                 where i.id_liv == l.id_livre && e.date_emp >= cutoffDate
+      public async Task<List<UnusedBookDto>> GetUnusedBooksAsync(string biblioId, int monthsBack = 6)
+      {
+          var cutoffDate = DateTime.Now.AddMonths(-monthsBack);
+          var query = await (from inv in _context.Inventaires
+                            join livre in _context.Livres on inv.id_liv equals livre.id_livre
+                            where inv.id_biblio == biblioId
+                            where !(from e in _context.Emprunts
+                                 join l in _context.Livres on e.Id_inv equals l.id_livre
+                                 where inv.id_liv == l.id_livre && e.date_emp >= cutoffDate
                                  select e).Any()
-                          select new
-                          {
-                              BookTitle = l.titre,
-                              BookId = l.id_livre,
-                              LastLoan = (from e in _context.Emprunts
-                                         join i in _context.Inventaires on e.Id_inv equals i.id_inv
-                                         where i.id_liv == l.id_livre
+                            select new
+                            {
+                                BookTitle = livre.titre,
+                                BookId = livre.id_livre,
+                                LastLoan = (from e in _context.Emprunts
+                                         join invent in _context.Inventaires on e.Id_inv equals invent.id_inv
+                                         where invent.id_liv == livre.id_livre
                                          orderby e.date_emp descending
                                          select e.date_emp).FirstOrDefault()
-                          })
-                          .ToListAsync();
+                            })
+                            .ToListAsync();
 
-        return query.Adapt<List<UnusedBookDto>>();
-    }
-
+          return query.Adapt<List<UnusedBookDto>>();
+      }
     public async Task<(decimal delayRate, List<UserDelayCountDto> topUsers, List<BookDelayCountDto> problematicBooks)> GetDelayDataAsync(string biblioId)
     {
         var totalLoans = await _context.Emprunts.CountAsync(e => e.id_biblio == biblioId);

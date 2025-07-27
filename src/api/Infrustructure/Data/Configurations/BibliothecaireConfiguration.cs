@@ -43,7 +43,7 @@ public class BibliothecaireConfiguration : IEntityTypeConfiguration<Bibliothecai
             .WithOne(p => p.Bibliothecaire)
             .HasForeignKey(p => p.IdBiblio);
 
-        builder.HasMany(e => e.Livres)
+        builder.HasMany(e => e.Inventaires)
             .WithOne(l => l.Bibliothecaire)
             .HasForeignKey(l => l.id_biblio)
             .OnDelete(DeleteBehavior.SetNull);

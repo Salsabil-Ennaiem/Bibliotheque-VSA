@@ -6,6 +6,7 @@ using domain.Interfaces;
 using Mapster;
 
 namespace api.Features.Livre;
+
 public class LivresHandler
 {
     private readonly ILivresRepository _livresRepository;
@@ -15,21 +16,48 @@ public class LivresHandler
         _livresRepository = livresRepository;
         _httpContextAccessor = httpContextAccessor;
     }
+    private string GetCurrentUserId()
+    {
+        var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        return userId;
+    }
+
+    //specifique
     public async Task<IEnumerable<LivreDTO>> GetAllLivresAsync()
     {
-        var entity = await _livresRepository.GetAllAsync();
+        var userId = GetCurrentUserId();
+        var entity = await _livresRepository.GetAllLivresAsync();
+        var filtered = entity.Where(e => e.Item2.id_biblio == userId);
         return entity.Select(e => e.Item1.Adapt<LivreDTO>());
 
     }
     public async Task<IEnumerable<LivreDTO>> SearchAsync(string searchTerm)
     {
+        try
+        {
+            var list = await _livresRepository.GetAllLivresAsync();
+            var query = list.Where(l =>
+              (l.Item1.titre != null && l.Item1.titre.Contains(searchTerm)) ||
+              (l.Item1.auteur != null && l.Item1.auteur.Contains(searchTerm)) ||
+              (l.Item1.isbn != null && l.Item1.isbn.Contains(searchTerm)) ||
+              (l.Item1.date_edition != null && l.Item1.date_edition.Contains(searchTerm)) ||
+              (l.Item1.Description != null && l.Item1.Description.Contains(searchTerm)) ||
+              (l.Item2.cote_liv != null && l.Item2.cote_liv.Contains(searchTerm))
+            );
+            return query.Select(x => x.Adapt<LivreDTO>());
 
-        var entities = await _livresRepository.SearchAsync(searchTerm);
-        return entities.Select(e => e.Item1.Adapt<LivreDTO>());
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error searching Livres: {ex.Message}", ex);
+        }
     }
+    //genrale
     public async Task<IEnumerable<LivreDTO>> GetAllAsync()
     {
-        var entities = await _livresRepository.GetAllAsync();
+        var entities = await _livresRepository.GetAllLivresAsync();
         return entities.Adapt<IEnumerable<LivreDTO>>();
 
     }
@@ -40,10 +68,10 @@ public class LivresHandler
     }
     public async Task<LivreDTO> CreateAsync(CreateLivreRequest livredto)
     {
-        var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = GetCurrentUserId();
         var livre = livredto.Adapt<Livres>();
         var inventaire = livredto.Adapt<Inventaire>();
-        livre.id_biblio = userId;
+        inventaire.id_biblio = userId;
         var createdLivre = await _livresRepository.CreateAsync(livre, inventaire);
         return createdLivre.Adapt<LivreDTO>();
     }
@@ -73,7 +101,6 @@ public class LivresHandler
                 var livre = new Livres
                 {
                     id_livre = Guid.NewGuid().ToString(),
-                    id_biblio = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty,
                     date_edition = row.GetCell(2)?.StringCellValue ?? string.Empty,
                     titre = row.GetCell(3)?.StringCellValue ?? string.Empty,
                     auteur = row.GetCell(4)?.StringCellValue ?? string.Empty,
@@ -90,6 +117,7 @@ public class LivresHandler
                 var inventaire = new Inventaire
                 {
                     id_inv = Guid.NewGuid().ToString(),
+                    id_biblio = GetCurrentUserId(),
                     id_liv = livre.id_livre,
                     cote_liv = row.GetCell(12)?.StringCellValue ?? string.Empty,
                     etat = etat,
@@ -113,41 +141,42 @@ public class LivresHandler
     }
     public async Task<MemoryStream> ExportAsync()
     {
-        var data = await _livresRepository.SearchAsync("");
+        var data = await SearchAsync("");
 
         var workbook = new XSSFWorkbook();
         var sheet = workbook.CreateSheet("LivresInventaire");
 
         var headerRow = sheet.CreateRow(0);
         string[] headers = {
-        "IdLivre", "IdBiblio", "DateEdition", "Titre", "Auteur", "ISBN", "Editeur", "Description", "Langue", "Couverture",
-        "IdInv", "IdLiv", "CoteLiv", "Etat", "Statut", "Inventaire"
+        "IdLivre", "DateEdition", "Titre", "Auteur", "ISBN", "Editeur", "Description", "Langue", "Couverture",
+         "CoteLiv", "Etat", "Statut", "Inventaire"
     };
 
         for (int i = 0; i < headers.Length; i++)
             headerRow.CreateCell(i).SetCellValue(headers[i]);
 
         int rowIndex = 1;
-        foreach (var (livre, inventaire) in data)
+        foreach (var livreDto in data) // Changed from tuple deconstruction to single object
         {
             var row = sheet.CreateRow(rowIndex++);
-            row.CreateCell(0).SetCellValue(livre.id_livre);
-            row.CreateCell(1).SetCellValue(livre.id_biblio);
-            row.CreateCell(2).SetCellValue(livre.date_edition);
-            row.CreateCell(3).SetCellValue(livre.titre ?? "");
-            row.CreateCell(4).SetCellValue(livre.auteur ?? "");
-            row.CreateCell(5).SetCellValue(livre.isbn ?? "");
-            row.CreateCell(6).SetCellValue(livre.editeur ?? "");
-            row.CreateCell(7).SetCellValue(livre.Description ?? "");
-            row.CreateCell(8).SetCellValue(livre.Langue ?? "");
-            row.CreateCell(9).SetCellValue(livre.couverture ?? "");
 
-            row.CreateCell(10).SetCellValue(inventaire.id_inv);
-            row.CreateCell(11).SetCellValue(inventaire.id_liv);
-            row.CreateCell(12).SetCellValue(inventaire.cote_liv ?? "");
-            row.CreateCell(13).SetCellValue(inventaire.etat.ToString());
-            row.CreateCell(14).SetCellValue(inventaire.statut.ToString());
-            row.CreateCell(15).SetCellValue(inventaire.inventaire ?? "");
+            // Book information (assuming these properties exist in LivreDTO)
+            row.CreateCell(0).SetCellValue(livreDto.id_livre ?? "");
+            row.CreateCell(1).SetCellValue(livreDto.date_edition ?? "");
+            row.CreateCell(2).SetCellValue(livreDto.titre ?? "");
+            row.CreateCell(3).SetCellValue(livreDto.auteur ?? "");
+            row.CreateCell(4).SetCellValue(livreDto.isbn ?? "");
+            row.CreateCell(5).SetCellValue(livreDto.editeur ?? "");
+            row.CreateCell(6).SetCellValue(livreDto.Description ?? "");
+            row.CreateCell(7).SetCellValue(livreDto.Langue ?? "");
+            row.CreateCell(8).SetCellValue(livreDto.couverture ?? "");
+
+            // Inventory information (assuming these properties exist in LivreDTO)
+
+            row.CreateCell(9).SetCellValue(livreDto.cote_liv ?? "");
+            row.CreateCell(10).SetCellValue(livreDto.etat?.ToString() ?? "");
+            row.CreateCell(11).SetCellValue(livreDto.statut.ToString() ?? "");
+            row.CreateCell(12).SetCellValue(livreDto.inventaire ?? "");
         }
 
         var stream = new MemoryStream();
@@ -158,5 +187,6 @@ public class LivresHandler
 
         return stream;
     }
+
 
 }

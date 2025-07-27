@@ -1,19 +1,17 @@
-
 using System.Security.Claims;
 using domain.Entity;
 using domain.Interfaces;
 using Mapster;
-
 
 namespace api.Features.Nouveautes
 {
     public class NouveauteHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly INouveauteRepository _nouveauteRepository;
+        private readonly IRepository<Nouveaute>  _nouveauteRepository;
 
 
-        public NouveauteHandler( IHttpContextAccessor httpContextAccessor, INouveauteRepository nouveauteRepository)
+        public NouveauteHandler( IHttpContextAccessor httpContextAccessor, IRepository<Nouveaute> nouveauteRepository)
         {
             _httpContextAccessor = httpContextAccessor;
             _nouveauteRepository = nouveauteRepository;
@@ -31,7 +29,7 @@ namespace api.Features.Nouveautes
 //list genral
         public async Task<IEnumerable<NouveauteGetALL>> GetAllNouvAsync()
         {
-            var rt = await _nouveauteRepository.GetAllNouvAsync();
+            var rt = await _nouveauteRepository.GetAllAsync();
             return rt.Adapt<IEnumerable<NouveauteGetALL>>();
 
         }
@@ -81,6 +79,5 @@ namespace api.Features.Nouveautes
         {
             await _nouveauteRepository.DeleteAsync(id);
         }
-
     }   
 }

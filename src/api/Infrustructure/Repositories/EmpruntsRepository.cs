@@ -13,17 +13,16 @@ namespace Infrastructure.Repositries
         {
             _dbContext = dbContext;
         }
-        
-        public async Task<IEnumerable<Emprunts>> GetOverdueEmpruntsAsync(string userId, DateTime currentDate)
-    {
-        return await _dbContext.Emprunts
-            .Where(e => e.id_biblio == userId 
-                     && e.date_retour_prevu < currentDate 
-                     && (e.date_effectif == null || e.Statut_emp != Statut_emp.retourne)) // not returned
-            .ToListAsync();
-    }
 
-                public async Task<IEnumerable<Emprunts>> SearchAsync(string searchTerm)
+        public async Task<IEnumerable<Emprunts>> GetOverdueEmpruntsAsync(string userId, DateTime currentDate)
+        {
+            return await _dbContext.Emprunts
+                .Where(e => e.id_biblio == userId
+                         && e.date_retour_prevu > currentDate
+                         && (e.date_effectif == null || e.Statut_emp != Statut_emp.retourne)) // not returned
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Emprunts>> SearchAsync(string searchTerm)
         {
             var query = from e in _dbContext.Emprunts
                         where e.date_emp.ToString().Contains(searchTerm)

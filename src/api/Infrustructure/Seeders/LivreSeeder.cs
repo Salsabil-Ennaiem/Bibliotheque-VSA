@@ -6,14 +6,13 @@ namespace Infrastructure.Seeders;
 public class LivreSeeder
 {
     
-    public static async Task<List<Livres>> SeedLivresAsync(BiblioDbContext dbContext, string biblio1Id, string biblio2Id)
+    public static async Task<List<Livres>> SeedLivresAsync(BiblioDbContext dbContext)
     {
         var livres = new List<Livres>
         {
             new Livres
             {
                 id_livre = Guid.NewGuid().ToString(),
-                id_biblio = biblio1Id,
                 date_edition = "2023",
                 titre = "Programmation C#",
                 auteur = "Jean Martin",
@@ -25,7 +24,6 @@ public class LivreSeeder
             new Livres
             {
                 id_livre = Guid.NewGuid().ToString(),
-                id_biblio = biblio1Id,
                 date_edition = "2022",
                 titre = "Base de Données",
                 auteur = "Marie Durand",
@@ -37,7 +35,6 @@ public class LivreSeeder
             new Livres
             {
                 id_livre = Guid.NewGuid().ToString(),
-                id_biblio = biblio2Id,
                 date_edition = "2024",
                 titre = "Architecture Web",
                 auteur = "Pierre Blanc",
@@ -49,7 +46,6 @@ public class LivreSeeder
             new Livres
             {
                 id_livre = Guid.NewGuid().ToString(),
-                id_biblio = biblio2Id,
                 date_edition = "2023",
                 titre = "JavaScript Avancé",
                 auteur = "Sophie Bernard",
